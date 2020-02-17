@@ -1,0 +1,30 @@
+User & Server
+
+1. User --> Server
+
+    * login / logoff
+    * status
+
+2. Server --> USer
+
+    * online/ offline status
+
+3. USer --> User
+
+    * direct messages
+    * broadcast messages to all users / group messaging
+
+Commands:
+
+        login <user> <password>
+        logoff
+
+        msg <user> body....
+        guest: "msg jim Hello World" <--- sent
+        jim: "msg guest Hello World" <--- recv
+
+        #topic <--- chatroom / group chat
+        join #topic
+        leave #topic
+        send: msg #topic body...
+        recv: msg #topic:<login> body...
