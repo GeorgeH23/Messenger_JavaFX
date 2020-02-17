@@ -25,7 +25,7 @@ public class AudioHandler {
     /** Website too look at: www.javalobby.org/java/forums/t18465.html */
     public void load(String resourcePath, String name) {
         // Establish path to file
-        URL resource = AudioHandler.class.getClassLoader().getResource(resourcePath);
+        URL resource = AudioHandler.class.getResource(resourcePath);
 
         // Get the audio input from the file and base format
         AudioInputStream input = null;
@@ -111,5 +111,4 @@ public class AudioHandler {
     public void setFramePosition(String name, int position){
         sounds.get(name).setFramePosition(position);
     }
-
 }

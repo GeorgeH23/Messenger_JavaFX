@@ -18,7 +18,6 @@ import javafx.scene.layout.AnchorPane;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.Duration;
-
 import java.io.File;
 import java.net.URL;
 import java.security.NoSuchAlgorithmException;

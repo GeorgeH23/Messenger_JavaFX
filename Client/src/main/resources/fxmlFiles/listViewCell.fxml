@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.shape.Circle?>
+
+<HBox fx:id="hBox" prefHeight="36.0" prefWidth="36.0" xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <Circle fx:id="pictureCircle" fill="DODGERBLUE" radius="18.0" stroke="BLACK" strokeType="INSIDE" />
+      <Circle fx:id="statusCircle" fill="#64ff1f" radius="7.0" stroke="BLACK" strokeType="INSIDE">
+         <HBox.margin>
+            <Insets left="-14.0" top="22.0" />
+         </HBox.margin>
+      </Circle>
+   </children>
+</HBox>

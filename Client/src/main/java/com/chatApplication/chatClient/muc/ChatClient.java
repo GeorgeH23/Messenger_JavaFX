@@ -14,9 +14,11 @@ public class ChatClient {
     private InputStream serverIn;
     private BufferedReader bufferedIn;
     private String thisClientLogin;
+    private String thisClientStatus;
 
     private List<UserStatusListener> userStatusListeners = new ArrayList<>();
     private List<MessageListener> messageListeners = new ArrayList<>();
+    private List<UserAvailabilityListener> userAvailabilityListeners = new ArrayList<>();
 
     private static ChatClient instance = new ChatClient();
 
@@ -39,6 +41,13 @@ public class ChatClient {
         }
     }
 
+    public void availabilityChange(String newStatus) throws IOException {
+        String cmd = "availabilityChange " + newStatus + "\n";
+        if (serverOut != null) {
+            serverOut.write(cmd.getBytes());
+        }
+    }
+
     public String login(String login, String password) throws IOException {
         String cmd = "login " + login + " " + password + "\n";
         serverOut.write(cmd.getBytes());
@@ -46,9 +55,14 @@ public class ChatClient {
         String response = bufferedIn.readLine();
         System.out.println("Response Line: " + response);
 
-        if ("Login OK".equalsIgnoreCase(response)) {
+        String[] tokens = response.split(" ");
+        String confirmation = tokens[0];
+        String status = tokens[1];
+
+        if ("LoginOK".equalsIgnoreCase(confirmation)) {
             startMessageReader();
             thisClientLogin = login;
+            thisClientStatus = status;
             return "Login OK";
         } else if ("No Such Username".equalsIgnoreCase(response)) {
             return "No Such Username";
@@ -82,10 +96,11 @@ public class ChatClient {
                         handleOnline(tokens);
                     } else if ("offline".equalsIgnoreCase(cmd)) {
                         handleOffline(tokens);
+                    } else if ("availability".equalsIgnoreCase(cmd)) {
+                        handleAvailability(tokens);
                     } else if ("msg".equalsIgnoreCase(cmd)) {
                         String[] tokensMsg = line.split(" ", 3);
                         //String[] tokensMsg = StringUtils.split(line, null, 3);
-
                         handleMessage(tokensMsg);
                     }
                 }
@@ -109,6 +124,15 @@ public class ChatClient {
         }
     }
 
+    private void handleAvailability(String[] tokens) {
+        String login = tokens[1];
+        String newStatus = tokens[2];
+
+        for (UserAvailabilityListener listener : userAvailabilityListeners) {
+            listener.availabilityStatus(login, newStatus);
+        }
+    }
+
     private void handleOffline(String[] tokens) {
         String login = tokens[1];
         for (UserStatusListener listener : userStatusListeners) {
@@ -118,8 +142,9 @@ public class ChatClient {
 
     private void handleOnline(String[] tokens) {
         String login = tokens[1];
+        String userStatus = tokens[2];
         for (UserStatusListener listener : userStatusListeners) {
-            listener.online(login);
+            listener.online(login, userStatus);
         }
     }
 
@@ -162,6 +187,10 @@ public class ChatClient {
         return thisClientLogin;
     }
 
+    public String getThisClientStatus() {
+        return thisClientStatus;
+    }
+
     public void addUserStatusListener(UserStatusListener listener) {
         userStatusListeners.add(listener);
     }
@@ -176,5 +205,13 @@ public class ChatClient {
 
     public void removeMessageListener(MessageListener listener) {
         messageListeners.remove(listener);
+    }
+
+    public void addUserAvailabilityListener(UserAvailabilityListener listener) {
+        userAvailabilityListeners.add(listener);
+    }
+
+    public void removeUserAvailabilityListener(UserAvailabilityListener listener) {
+        userAvailabilityListeners.remove(listener);
     }
 }

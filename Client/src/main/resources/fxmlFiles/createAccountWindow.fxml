@@ -8,7 +8,7 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane fx:id="root" prefHeight="450.0" prefWidth="420.0" xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.chatApplication.chatClient.gui.Controllers.CreateAccountController" stylesheets="@/utils/css/createAccount.css">
+<AnchorPane fx:id="root" prefHeight="450.0" prefWidth="420.0" xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.chatApplication.chatClient.gui.Controllers.CreateAccountController" stylesheets="@../utils/css/createAccount.css">
     <children>
         <AnchorPane fx:id="svgPane" layoutY="32.0" prefHeight="418.0" prefWidth="420.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="32.0">
             <children>

@@ -31,13 +31,13 @@ public class Main extends Application {
         DataSource.getInstance().open();
 
         AudioHandler audio = AudioHandler.getInstance();
-        audio.load("utils/sounds/type.wav", "start");
+        audio.load("/utils/sounds/type.wav", "start");
         audio.play("start", 0);
 
         primaryStage.setTitle("Messenger");
         Scene root = new Scene((FXMLLoader.load(getClass().getResource("/fxmlFiles/loginWindow.fxml"))), 420, 350);
         // Add CSS stylesheet for the main window
-        // root.getStylesheets().add(getClass().getResource("/utils/css/Login.css").toString());
+        //root.getStylesheets().add(getClass().getResource("/utils/css/Login.css").toString());
         primaryStage.initStyle(StageStyle.TRANSPARENT);
         primaryStage.setScene(root);
         primaryStage.show();

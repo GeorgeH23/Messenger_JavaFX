@@ -8,7 +8,9 @@ import java.net.Socket;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /* This class is implemented in order to be able to send messages from one connection
 to the other connections.
@@ -17,6 +19,7 @@ public class Server extends Thread {
 
     private final int serverPort;
     private final List<ServerWorker> workerList = new ArrayList<>();
+    private final Map<String, String> workerStatusList = new HashMap<>();
 
     public Server(int serverPort) {
         this.serverPort = serverPort;
@@ -49,6 +52,10 @@ public class Server extends Thread {
 
     public void removeWorker(ServerWorker serverWorker) {
         workerList.remove(serverWorker);
+    }
+
+    public Map<String, String> getWorkerStatusList() {
+        return workerStatusList;
     }
 
     private void appendText(String text) {

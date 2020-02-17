@@ -36,6 +36,6 @@ public class PasswordHasher {
     }
 
     public static void main(String[] args) throws NoSuchAlgorithmException {
-        System.out.println(getInstance().generateHash("george"));
+        System.out.println(getInstance().generateHash("john"));
     }
 }

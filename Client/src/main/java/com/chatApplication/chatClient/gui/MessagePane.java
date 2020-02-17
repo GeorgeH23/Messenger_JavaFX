@@ -26,7 +26,7 @@ public class MessagePane {
             e.printStackTrace();
         }
         this.controller = fxmlLoader.getController();
-        // root.getStylesheets().add(getClass().getResource("/utils/css/messageWindow.css").toString());
+        //root.getStylesheets().add(getClass().getResource("/utils/css/messageWindow.css").toString());
         this.stage = new Stage();
         this.login = login;
 

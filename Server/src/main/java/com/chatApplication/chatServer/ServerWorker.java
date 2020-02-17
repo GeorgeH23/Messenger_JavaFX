@@ -23,6 +23,7 @@ public class ServerWorker extends Thread {
     private HashSet<String> topicSet;
     private static int loginCount = 0;
     private boolean isLoggedIn;
+    private Map<String, String> userStatus;
     private static final DataSource DATA_SOURCE = DataSource.getInstance();
 
     public ServerWorker(Server server, Socket clientSocket) {
@@ -31,6 +32,7 @@ public class ServerWorker extends Thread {
         this.login = null;
         this.isLoggedIn = false;
         this.topicSet = new HashSet<>();
+        this.userStatus = server.getWorkerStatusList();
     }
 
     @Override
@@ -58,6 +60,9 @@ public class ServerWorker extends Thread {
                 if ("logoff".equals(cmd) || "quit".equalsIgnoreCase(cmd)) {
                     handleLogoff();
                     break;
+                } else if ("availabilityChange".equals(cmd)) {
+                    String[] tokensMsg = StringUtils.split(line, null, 3);
+                    handleAvailabilityChange(tokensMsg);
                 } else if ("login".equalsIgnoreCase(cmd)) {
 
                     List<ServerWorker> workerList = server.getWorkerList();
@@ -84,7 +89,7 @@ public class ServerWorker extends Thread {
                         clientSocket.close();
                         break;
                     } else {
-                       if (!handleLogin(outputStream, tokens)) {
+                        if (!handleLogin(outputStream, tokens)) {
                             break;
                         }
                     }
@@ -174,6 +179,25 @@ public class ServerWorker extends Thread {
         }
     }
 
+    private void handleAvailabilityChange(String[] tokens) throws IOException {
+        if (tokens.length == 2) {
+            String newStatus = tokens[1];
+            if (getIsLoggedIn()) {
+                userStatus.replace(login, newStatus);
+                String message;
+                List<ServerWorker> workerList = server.getWorkerList();
+                for (ServerWorker worker : workerList) {
+                    if (worker.getLogin() != null) {
+                        if (!login.equals(worker.getLogin())) {
+                            message = "Availability: \"" + login + "\" " + newStatus + "\n";
+                            worker.send(message);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     private boolean handleLogin(OutputStream outputStream, String[] tokens) throws IOException {
         if (tokens.length == 3) {
             String login = tokens[1];
@@ -186,9 +210,16 @@ public class ServerWorker extends Thread {
             switch (dbMessage) {
                 case "Credentials OK":
                     isLoggedIn = true;
-                    msg = "Login OK\n";
-                    outputStream.write(msg.getBytes());
                     this.login = login;
+                    loginCount++;
+
+                    if (!userStatus.containsKey(login)) {
+                        userStatus.put(login, "available");
+                    }
+
+                    msg = "LoginOK " + userStatus.get(login) + "\n";
+                    outputStream.write(msg.getBytes());
+
                     System.out.println("User \"" + login + "\" logged in successfully.");
                     appendText("User \"" + login + "\" logged in successfully.");
 
@@ -198,7 +229,7 @@ public class ServerWorker extends Thread {
                     // Send other online users current user's status
                     for (ServerWorker worker : workerList) {
                         if (!login.equals(worker.getLogin())) {
-                            message = "Online: \"" + login + "\"\n";
+                            message = "Online: \"" + login + "\" " + userStatus.get(login) + "\n";
                             worker.send(message);
                         } else {
                             if (ServerWorker.loginCount == 1) {
@@ -209,7 +240,7 @@ public class ServerWorker extends Thread {
                                 for (ServerWorker onlineWorker : workerList) {
                                     if (onlineWorker.getLogin() != null) {
                                         if (!login.equals(onlineWorker.getLogin())) {
-                                            message = "Online: \"" + onlineWorker.getLogin() + "\"\n";
+                                            message = "Online: \"" + onlineWorker.getLogin() + "\" " + userStatus.get(onlineWorker.getLogin()) + "\n";
                                             System.out.println(message);
                                             appendText(message);
                                             worker.send(message);

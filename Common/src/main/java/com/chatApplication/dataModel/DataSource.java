@@ -9,6 +9,11 @@ import java.util.Map;
 
 public class DataSource {
 
+    /*public static final String DB_NAME = "database" + File.separator + "ChatUsersDB.db";
+    public static final String PATH = Paths.get(".").toAbsolutePath().normalize().toString() +
+            File.separator +"src" + File.separator +"main" + File.separator +"resources" + File.separator;
+    public static final String CONNECTION_STRING = "jdbc:sqlite:" + PATH + DB_NAME;*/
+
     public static final String DB_NAME = "ChatUsersDB.db";
     public static final String PATH = System.getProperty("user.home") + File.separator + "Documents" + File.separator +
             "MessengerApplication" + File.separator + "Database" + File.separator;
@@ -102,7 +107,7 @@ public class DataSource {
         }
     }
 
-    public Map<String, String> checkLogin(String username) {
+    public Map<String,String> checkLogin(String username) {
         Map<String, String> resultMap = new HashMap<>();
 
         try {
@@ -141,7 +146,7 @@ public class DataSource {
                 if (!user.getPicture().equals("")) {
                     inserUser.setBytes(4, readFile(user.getPicture()));
                 } else {
-                    File file = new File(getClass().getClassLoader().getResource("utils/images/users/user.png").getFile());
+                    File file = new File(getClass().getResource("/images/user.png").getFile());
                     String path = file.getAbsolutePath();
                     inserUser.setBytes(4, readFile(path));
                 }
@@ -169,13 +174,13 @@ public class DataSource {
             File file = new File(path);
             FileOutputStream fos = new FileOutputStream(file);
 
-                while (results.next()) {
-                    InputStream input = results.getBinaryStream(1);
-                        byte[] buffer = new byte[1024];
-                        while (input.read(buffer) > 0) {
-                            fos.write(buffer);
-                        }
+            while (results.next()) {
+                InputStream input = results.getBinaryStream(1);
+                byte[] buffer = new byte[1024];
+                while (input.read(buffer) > 0) {
+                    fos.write(buffer);
                 }
+            }
 
             return file.getAbsolutePath();
 
@@ -205,35 +210,6 @@ public class DataSource {
     public static void main(String[] args) throws IOException, SQLException, NoSuchAlgorithmException {
         DataSource.getInstance().open();
 
-        //System.out.println(DataSource.getInstance().queryUserPicture("admin"));
-
         DataSource.getInstance().close();
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

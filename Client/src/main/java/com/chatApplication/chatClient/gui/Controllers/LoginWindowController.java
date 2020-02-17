@@ -23,7 +23,6 @@ import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.util.Duration;
-
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
@@ -51,8 +50,8 @@ public class LoginWindowController implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         audio = AudioHandler.getInstance();
-        audio.load("utils/sounds/chimeup.wav", "login");
-        audio.load("utils/sounds/door.wav", "logoff");
+        audio.load("/utils/sounds/chimeup.wav", "login");
+        audio.load("/utils/sounds/door.wav", "logoff");
         addDraggableNode(titleBar);
 
         // This is used for disabling the context menu
@@ -78,7 +77,7 @@ public class LoginWindowController implements Initializable {
             MainController controller = fxmlLoader.getController();
             controller.addListeners();
             Stage primaryStage = new Stage();
-            // parent.getStylesheets().add(getClass().getResource("/utils/css/fullpackstyling.css").toString());
+            //parent.getStylesheets().add(getClass().getResource("/utils/css/fullpackstyling.css").toString());
             primaryStage.setScene(new Scene(parent));
             primaryStage.initStyle(StageStyle.TRANSPARENT);
 
@@ -93,15 +92,17 @@ public class LoginWindowController implements Initializable {
                         txtPassword.getScene().getWindow().hide();
                         primaryStage.show();
                         String loggedUserName = ChatClient.getInstance().getThisClientLogin();
+                        String loggedUserStatus = ChatClient.getInstance().getThisClientStatus();
                         controller.setMyPicture(loggedUserName);
                         controller.setLoggedClientName(loggedUserName);
+                        controller.setLoggedClientStatus(loggedUserStatus);
 
                         File file = new File(System.getProperty("user.home") + File.separator + "Documents" + File.separator +
                                 "MessengerApplication" + File.separator + loggedUserName + ".jpg");
                         if (file.isFile()) {
                             controller.setLoggedClientPicture(file.toURI().toURL().toString());
                         } else {
-                            String filePath = new File(getClass().getClassLoader().getResource("utils/images/users/user.png").getFile()).toURI().toString();
+                            String filePath = new File(getClass().getClassLoader().getResource("/utils/images/icons/user.png").getFile()).toURI().toString();
                             controller.setLoggedClientPicture(filePath);
                         }
 

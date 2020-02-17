@@ -60,7 +60,7 @@ public class MessagePaneController {
     private void initialize() {
 
         audio = AudioHandler.getInstance();
-        audio.load("utils/sounds/sent.wav", "sent");
+        audio.load("/utils/sounds/sent.wav", "sent");
 
         // Automatically scroll down to the last message in the conversation.
         chatBox.heightProperty().addListener(
@@ -69,7 +69,6 @@ public class MessagePaneController {
                     scrollPane.setVvalue( 1.0d );
                 }
         );
-
     }
 
     public void inititializePane(String paneTitle){
@@ -150,7 +149,6 @@ public class MessagePaneController {
         if (fromLogin.replaceAll("\\p{Punct}", "").equals(userID.getText())) {
 
             createMessage(msgBody, MessageType.RECEIVED);
-
         }
     }
 
@@ -171,7 +169,7 @@ public class MessagePaneController {
                 if (file.isFile()) {
                     img.setFill(new ImagePattern(new Image(file.toURI().toURL().toString())));
                 } else {
-                    String filePath = new File(getClass().getClassLoader().getResource("utils/images/users/user.png").getFile()).toURI().toString();
+                    String filePath = new File(getClass().getResource("/utils/images/users/user.png").getFile()).toURI().toString();
                     img.setFill(new ImagePattern(new Image(filePath)));
                 }
             } catch (Exception e) {
@@ -186,7 +184,7 @@ public class MessagePaneController {
                 if (file.isFile()) {
                     img.setFill(new ImagePattern(new Image(file.toURI().toURL().toString())));
                 } else {
-                    String filePath = new File(getClass().getClassLoader().getResource("utils/images/users/user.png").getFile()).toURI().toString();
+                    String filePath = new File(getClass().getResource("/utils/images/users/user.png").getFile()).toURI().toString();
                     img.setFill(new ImagePattern(new Image(filePath)));
                 }
             } catch (Exception e) {
