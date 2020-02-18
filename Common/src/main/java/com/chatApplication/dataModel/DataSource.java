@@ -146,9 +146,7 @@ public class DataSource {
                 if (!user.getPicture().equals("")) {
                     inserUser.setBytes(4, readFile(user.getPicture()));
                 } else {
-                    File file = new File(getClass().getResource("/images/user.png").getFile());
-                    String path = file.getAbsolutePath();
-                    inserUser.setBytes(4, readFile(path));
+                    inserUser.setBytes(4, readFile("/utils/images/users/user.png"));
                 }
 
                 System.out.println("\nStoring user in database: " + user.toString());
@@ -193,11 +191,16 @@ public class DataSource {
     private byte[] readFile(String path) {
         ByteArrayOutputStream bos = null;
         try {
-            File file = new File(path);
-            FileInputStream input = new FileInputStream(file);
+            InputStream input;
+            if (path.equals("/utils/images/users/user.png")) {
+                input = getClass().getResourceAsStream(path);
+            } else {
+                File file = new File(path);
+                input = new FileInputStream(file);
+                System.out.println("Reading input file: " + file.getAbsolutePath());
+            }
             bos = new ByteArrayOutputStream();
             byte[] buffer = new byte[1024];
-            System.out.println("Reading input file: " + file.getAbsolutePath());
             for (int len; (len = input.read(buffer)) != -1;){
                 bos.write(buffer, 0, len);
             }

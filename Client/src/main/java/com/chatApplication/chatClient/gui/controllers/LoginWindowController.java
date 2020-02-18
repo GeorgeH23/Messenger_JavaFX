@@ -1,8 +1,8 @@
-package com.chatApplication.chatClient.gui.Controllers;
+package com.chatApplication.chatClient.gui.controllers;
 
 import com.chatApplication.chatClient.gui.AudioHandler;
-import com.chatApplication.chatClient.muc.ChatClient;
 import com.chatApplication.dataModel.DataSource;
+import com.chatApplication.chatClient.muc.ChatClient;
 import javafx.animation.PauseTransition;
 import javafx.application.Platform;
 import javafx.event.Event;

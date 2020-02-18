@@ -22,7 +22,7 @@
     </properties>
 
     <dependencies>
-        <!-- add Common module as dependency -->
+         <!--add Common module as dependency-->
         <dependency>
             <groupId>groupId</groupId>
             <artifactId>Common</artifactId>

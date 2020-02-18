@@ -1,14 +1,14 @@
-package com.chatApplication.chatClient.gui.Controllers;
+package com.chatApplication.chatClient.gui.controllers;
 
 import com.chatApplication.chatClient.gui.AudioHandler;
 import com.chatApplication.chatClient.gui.ChatUser;
 import com.chatApplication.chatClient.gui.MessagePane;
 import com.chatApplication.chatClient.gui.UserListViewCell;
+import com.chatApplication.dataModel.DataSource;
 import com.chatApplication.chatClient.muc.ChatClient;
 import com.chatApplication.chatClient.muc.MessageListener;
 import com.chatApplication.chatClient.muc.UserAvailabilityListener;
 import com.chatApplication.chatClient.muc.UserStatusListener;
-import com.chatApplication.dataModel.DataSource;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -29,10 +29,10 @@ import tray.animations.AnimationType;
 import tray.notification.NotificationType;
 import tray.notification.TrayNotification;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -40,7 +40,6 @@ public class MainController implements UserStatusListener, MessageListener, User
 
     private static final ChatClient CHAT_CLIENT = ChatClient.getInstance();
     private final Map<String, MessagePane> messagePanes = new HashMap<>();
-    //private ObservableList<User> list;
     private ObservableList<ChatUser> list;
     private long startTime;
     private double initialX;
@@ -48,7 +47,6 @@ public class MainController implements UserStatusListener, MessageListener, User
     private AudioHandler audio;
 
     @FXML
-    //private ListView<User> clients;
     private ListView<ChatUser> clients;
     @FXML
     private TitledPane titledPane;
@@ -79,6 +77,7 @@ public class MainController implements UserStatusListener, MessageListener, User
 
         list = FXCollections.observableArrayList();
         clients.setItems(list);
+        clients.getItems().sort(Comparator.comparing(o -> o.getLogin().toLowerCase()));
         clients.setCellFactory(userListView -> new UserListViewCell());
         clients.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
     }
@@ -122,6 +121,7 @@ public class MainController implements UserStatusListener, MessageListener, User
             ChatUser chatUser = new ChatUser(username, path, userStatus);
             System.out.println(userStatus);
             list.add(chatUser);
+            clients.getItems().sort(Comparator.comparing(o -> o.getLogin().toLowerCase()));
             showNotification(login, "logon", timeDifference);
         });
     }

@@ -1,6 +1,6 @@
 package com.chatApplication.chatClient.gui;
 
-import com.chatApplication.chatClient.gui.Controllers.MessagePaneController;
+import com.chatApplication.chatClient.gui.controllers.MessagePaneController;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;

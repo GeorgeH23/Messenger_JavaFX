@@ -1,4 +1,4 @@
-package com.chatApplication.chatClient.gui.Controllers;
+package com.chatApplication.chatClient.gui.controllers;
 
 import com.chatApplication.chatClient.gui.AudioHandler;
 import com.chatApplication.chatClient.gui.MessageType;
