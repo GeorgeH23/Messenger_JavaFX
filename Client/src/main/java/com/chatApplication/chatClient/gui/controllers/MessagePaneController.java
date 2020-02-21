@@ -1,6 +1,7 @@
 package com.chatApplication.chatClient.gui.controllers;
 
 import com.chatApplication.chatClient.gui.AudioHandler;
+import com.chatApplication.chatClient.gui.ImageHandler;
 import com.chatApplication.chatClient.gui.MessageType;
 import com.chatApplication.chatClient.muc.ChatClient;
 import javafx.application.Platform;
@@ -164,14 +165,7 @@ public class MessagePaneController {
             txtName = new Text(getCurrentLocalDateTimeStamp() + "\n" + myself + "\n");
 
             try {
-                File file = new File(System.getProperty("user.home") + File.separator + "Documents" + File.separator +
-                        "MessengerApplication" + File.separator + myself + ".jpg");
-                if (file.isFile()) {
-                    img.setFill(new ImagePattern(new Image(file.toURI().toURL().toString())));
-                } else {
-                    String filePath = new File(getClass().getResource("/utils/images/users/user.png").getFile()).toURI().toString();
-                    img.setFill(new ImagePattern(new Image(filePath)));
-                }
+                img.setFill(ImageHandler.getInstance().getCurrentLoggedUserImage());
             } catch (Exception e) {
                 e.printStackTrace();
             }

@@ -19,7 +19,7 @@ public class MessagePane {
 
     public MessagePane(String login) {
         this.fxmlLoader = new FXMLLoader();
-        fxmlLoader.setLocation(getClass().getResource("/fxmlFiles/messagePaneDialog.fxml"));
+        fxmlLoader.setLocation(getClass().getResource("/fxmlFiles/messagePaneView.fxml"));
         try {
             this.root = fxmlLoader.load();
         } catch (IOException e) {

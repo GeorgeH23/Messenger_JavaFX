@@ -1,22 +1,19 @@
 package com.chatApplication.chatClient.gui.controllers;
 
-import com.chatApplication.chatClient.gui.AudioHandler;
-import com.chatApplication.chatClient.gui.ChatUser;
-import com.chatApplication.chatClient.gui.MessagePane;
-import com.chatApplication.chatClient.gui.UserListViewCell;
+import com.chatApplication.chatClient.gui.*;
 import com.chatApplication.dataModel.DataSource;
 import com.chatApplication.chatClient.muc.ChatClient;
 import com.chatApplication.chatClient.muc.MessageListener;
 import com.chatApplication.chatClient.muc.UserAvailabilityListener;
 import com.chatApplication.chatClient.muc.UserStatusListener;
 import javafx.application.Platform;
+import javafx.beans.Observable;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.effect.DropShadow;
-import javafx.scene.image.Image;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
@@ -28,15 +25,12 @@ import javafx.util.Duration;
 import tray.animations.AnimationType;
 import tray.notification.NotificationType;
 import tray.notification.TrayNotification;
-
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URISyntaxException;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 
-public class MainController implements UserStatusListener, MessageListener, UserAvailabilityListener {
+public class MainWindowController implements UserStatusListener, MessageListener, UserAvailabilityListener {
 
     private static final ChatClient CHAT_CLIENT = ChatClient.getInstance();
     private final Map<String, MessagePane> messagePanes = new HashMap<>();
@@ -75,7 +69,7 @@ public class MainController implements UserStatusListener, MessageListener, User
 
         titledPane.setEffect(new DropShadow(10, Color.BLUE));
 
-        list = FXCollections.observableArrayList();
+        list = FXCollections.observableArrayList( chatUser -> new Observable[] {chatUser.getStatusImage(), chatUser.getUserImage()});
         clients.setItems(list);
         clients.getItems().sort(Comparator.comparing(o -> o.getLogin().toLowerCase()));
         clients.setCellFactory(userListView -> new UserListViewCell());
@@ -112,15 +106,11 @@ public class MainController implements UserStatusListener, MessageListener, User
     @Override
     public void online(String login, String userStatus) {
         String username = login.replaceAll("\\p{Punct}", "");
-        //System.out.println(login + " onlineeeeeeeeeeeee");
         long timeDifference = System.currentTimeMillis() - startTime;
-
         String path = DataSource.getInstance().queryUserPicture(username);
 
         Platform.runLater(() -> {
-            ChatUser chatUser = new ChatUser(username, path, userStatus);
-            System.out.println(userStatus);
-            list.add(chatUser);
+            list.add(new ChatUser(username, path, userStatus));
             clients.getItems().sort(Comparator.comparing(o -> o.getLogin().toLowerCase()));
             showNotification(login, "logon", timeDifference);
         });
@@ -149,11 +139,10 @@ public class MainController implements UserStatusListener, MessageListener, User
             String username = login.replaceAll("\\p{Punct}", "");
             for (ChatUser user : list) {
                 if (user.getLogin().equals(username)) {
-                    user.setColor(newStatus);
+                    user.setStatusImage(newStatus);
                     break;
                 }
             }
-            clients.refresh();
         });
     }
 
@@ -201,28 +190,28 @@ public class MainController implements UserStatusListener, MessageListener, User
     private void changeStatusToAvailable() throws IOException {
         CHAT_CLIENT.availabilityChange("available");
         statusMenu.setText("Available");
-        setLoggedUserStatusLight("/utils/images/icons/ok.png");
+        setLoggedUserStatusLight(ImageHandler.getInstance().getAvailableStatusImage());
     }
 
     @FXML
     private void changeStatusToBusy() throws IOException {
         CHAT_CLIENT.availabilityChange("busy");
         statusMenu.setText("Busy");
-        setLoggedUserStatusLight("/utils/images/icons/busy.png");
+        setLoggedUserStatusLight(ImageHandler.getInstance().getBusyStatusImage());
     }
 
     @FXML
     private void changeStatusToDoNotDisturb() throws IOException {
         CHAT_CLIENT.availabilityChange("dnd");
         statusMenu.setText("Do Not Disturb");
-        setLoggedUserStatusLight("/utils/images/icons/dnd.png");
+        setLoggedUserStatusLight(ImageHandler.getInstance().getDndStatusImage());
     }
 
     @FXML
     private void changeStatusToAway() throws IOException {
         CHAT_CLIENT.availabilityChange("away");
         statusMenu.setText("Away");
-        setLoggedUserStatusLight("/utils/images/icons/away.png");
+        setLoggedUserStatusLight(ImageHandler.getInstance().getAwayStatusImage());
     }
 
     // This function is used for moving the MessagePanes on the screen.
@@ -256,7 +245,8 @@ public class MainController implements UserStatusListener, MessageListener, User
                 message = login + " just logged in.";
                 audio.play("online", 0);
             } else {
-                message = login + " is online.";
+                return;
+                //message = login + " is online.";
             }
             tray.setNotificationType(NotificationType.SUCCESS);
 
@@ -302,48 +292,40 @@ public class MainController implements UserStatusListener, MessageListener, User
         CHAT_CLIENT.addUserAvailabilityListener(this);
     }
 
-    public void setMyPicture(String name) {
-        DataSource.getInstance().queryUserPicture(name);
-    }
-
     public void setLoggedClientName(String name) {
         loggedClientName.setText(name);
     }
 
-    public void setLoggedClientPicture(String path) {
-        loggedClientPicture.setFill(new ImagePattern(new Image(path)));
+    public void setLoggedClientPicture() {
+        loggedClientPicture.setFill(ImageHandler.getInstance().getCurrentLoggedUserImage());
     }
 
     public void setLoggedClientStatus(String loggedUserStatus) {
         switch (loggedUserStatus) {
             case "available" :
                 statusMenu.setText("Available");
-                setLoggedUserStatusLight("/utils/images/icons/ok.png");
+                setLoggedUserStatusLight(ImageHandler.getInstance().getAvailableStatusImage());
                 break;
             case "busy" :
                 statusMenu.setText("Busy");
-                setLoggedUserStatusLight("/utils/images/icons/busy.png");
+                setLoggedUserStatusLight(ImageHandler.getInstance().getBusyStatusImage());
                 break;
             case "away" :
                 statusMenu.setText("Away");
-                setLoggedUserStatusLight("/utils/images/icons/away.png");
+                setLoggedUserStatusLight(ImageHandler.getInstance().getAwayStatusImage());
                 break;
             case "dnd" :
                 statusMenu.setText("Do Not Disturb");
-                setLoggedUserStatusLight("/utils/images/icons/dnd.png");
+                setLoggedUserStatusLight(ImageHandler.getInstance().getDndStatusImage());
                 break;
             default:
                 statusMenu.setText("Unknown Status");
-                setLoggedUserStatusLight("/utils/images/icons/unknown.png");
+                setLoggedUserStatusLight(ImageHandler.getInstance().getUnknownStatusImage());
                 break;
         }
     }
 
-    private void setLoggedUserStatusLight(String path) {
-        try {
-            loggedUserStatusLight.setFill(new ImagePattern(new Image(getClass().getResource(path).toURI().toURL().toString())));
-        } catch (MalformedURLException | URISyntaxException e) {
-            e.printStackTrace();
-        }
+    private void setLoggedUserStatusLight(ImagePattern path) {
+        loggedUserStatusLight.setFill(path);
     }
 }

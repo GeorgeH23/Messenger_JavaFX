@@ -1,6 +1,7 @@
 package com.chatApplication.chatClient.gui.controllers;
 
 import com.chatApplication.chatClient.gui.AudioHandler;
+import com.chatApplication.chatClient.gui.ImageHandler;
 import com.chatApplication.dataModel.DataSource;
 import com.chatApplication.chatClient.muc.ChatClient;
 import javafx.animation.PauseTransition;
@@ -23,7 +24,7 @@ import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.util.Duration;
-import java.io.File;
+
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -59,6 +60,7 @@ public class LoginWindowController implements Initializable {
         txtPassword.addEventFilter(ContextMenuEvent.CONTEXT_MENU_REQUESTED, Event::consume);
     }
 
+    // This method handles the login process which is triggered by the "Login" button
     @FXML
     public void loginAction() throws IOException{
 
@@ -72,9 +74,9 @@ public class LoginWindowController implements Initializable {
         if (!txtUsername.getText().equals("") && !txtPassword.getText().equals("")) {
 
             FXMLLoader fxmlLoader = new FXMLLoader();
-            fxmlLoader.setLocation(getClass().getResource("/fxmlFiles/mainWindow.fxml"));
+            fxmlLoader.setLocation(getClass().getResource("/fxmlFiles/mainWindowView.fxml"));
             Parent parent = fxmlLoader.load();
-            MainController controller = fxmlLoader.getController();
+            MainWindowController controller = fxmlLoader.getController();
             controller.addListeners();
             Stage primaryStage = new Stage();
             //parent.getStylesheets().add(getClass().getResource("/utils/css/fullpackstyling.css").toString());
@@ -93,18 +95,10 @@ public class LoginWindowController implements Initializable {
                         primaryStage.show();
                         String loggedUserName = ChatClient.getInstance().getThisClientLogin();
                         String loggedUserStatus = ChatClient.getInstance().getThisClientStatus();
-                        controller.setMyPicture(loggedUserName);
+                        ImageHandler.getInstance().loadCurrentLoggedUserImage(loggedUserName);
                         controller.setLoggedClientName(loggedUserName);
                         controller.setLoggedClientStatus(loggedUserStatus);
-
-                        File file = new File(System.getProperty("user.home") + File.separator + "Documents" + File.separator +
-                                "MessengerApplication" + File.separator + loggedUserName + ".jpg");
-                        if (file.isFile()) {
-                            controller.setLoggedClientPicture(file.toURI().toURL().toString());
-                        } else {
-                            String filePath = new File(getClass().getClassLoader().getResource("/utils/images/icons/user.png").getFile()).toURI().toString();
-                            controller.setLoggedClientPicture(filePath);
-                        }
+                        controller.setLoggedClientPicture();
 
                         primaryStage.setOnHiding(event -> {
                             try {
@@ -135,7 +129,42 @@ public class LoginWindowController implements Initializable {
         }
     }
 
-    // This function is used for moving the MessagePanes on the screen.
+    // This method handles the new account creation process
+    @FXML
+    public void createAccount(MouseEvent mouseEvent) throws IOException {
+        if (mouseEvent.getButton() == MouseButton.PRIMARY){
+
+            Stage primaryStage = new Stage();
+            primaryStage.setTitle("Messenger");
+            Scene root = new Scene((FXMLLoader.load(getClass().getResource("/fxmlFiles/createAccountView.fxml"))), 420, 450);
+            // Add CSS stylesheet for the main window programmatically
+            // root.getStylesheets().add(getClass().getResource("/utils/css/createAccount.css").toString());
+            primaryStage.setScene(root);
+            primaryStage.initStyle(StageStyle.TRANSPARENT);
+
+            ((Stage)txtPassword.getScene().getWindow()).hide();
+
+            primaryStage.show();
+            primaryStage.setOnHiding(event -> ((Stage)txtPassword.getScene().getWindow()).show());
+        }
+    }
+
+    // This method is responsible for closing the application when the "Exit" button is pressed
+    @FXML
+    public void closeAction() {
+        DataSource.getInstance().close();
+        Platform.exit();
+        System.exit(0);
+    }
+
+    // This method is responsible for minimizing the application window when the "Minimize" button is pressed
+    @FXML
+    public void minimizeAction() {
+        Stage stage = (Stage) btnMinimize.getScene().getWindow();
+        stage.setIconified(true);
+    }
+
+    // This method is a custom implementation used for enabling the movement of the "MessagePanes" around the screen.
     private void addDraggableNode(final Node node) {
 
         node.setOnMousePressed(event -> {
@@ -150,37 +179,6 @@ public class LoginWindowController implements Initializable {
                 node.getScene().getWindow().setY(event.getScreenY() - initialY);
             }
         });
-    }
-
-    @FXML
-    public void createAccount(MouseEvent mouseEvent) throws IOException {
-        if (mouseEvent.getButton() == MouseButton.PRIMARY){
-
-            Stage primaryStage = new Stage();
-            primaryStage.setTitle("Messenger");
-            Scene root = new Scene((FXMLLoader.load(getClass().getResource("/fxmlFiles/createAccountWindow.fxml"))), 420, 450);
-            // Add CSS stylesheet for the main window
-            // root.getStylesheets().add(getClass().getResource("/utils/css/createAccount.css").toString());
-            primaryStage.setScene(root);
-            primaryStage.initStyle(StageStyle.TRANSPARENT);
-
-            ((Stage)txtPassword.getScene().getWindow()).hide();
-
-            primaryStage.show();
-            primaryStage.setOnHiding(event -> ((Stage)txtPassword.getScene().getWindow()).show());
-        }
-    }
-
-    @FXML
-    public void closeAction() {
-        DataSource.getInstance().close();
-        Platform.exit();
-    }
-
-    @FXML
-    public void minimizeAction() {
-        Stage stage = (Stage) btnMinimize.getScene().getWindow();
-        stage.setIconified(true);
     }
 
     private void showWarning(Node node, double duration) {
