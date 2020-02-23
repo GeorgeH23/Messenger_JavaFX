@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.Tooltip?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+
+<AnchorPane fx:id="root" prefHeight="357.0" prefWidth="421.0" stylesheets="@../utils/css/loginWindowStyling.css" xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.chatApplication.chatClient.gui.controllers.LoginWindowController">
+   <children>
+      <AnchorPane fx:id="svgPane" layoutX="-1.0" layoutY="32.0" prefHeight="325.0" prefWidth="421.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="-1.0" AnchorPane.rightAnchor="1.0" AnchorPane.topAnchor="32.0">
+         <children>
+            <HBox layoutX="104.0" layoutY="92.0" prefHeight="31.0" prefWidth="214.0" style="-fx-background-color: #ffffff; -fx-background-radius: 15;">
+               <children>
+                  <ImageView fitHeight="21.0" fitWidth="21.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../utils/images/icons/user.png" />
+                     </image>
+                     <HBox.margin>
+                        <Insets left="10.0" top="6.0" />
+                     </HBox.margin>
+                  </ImageView>
+                  <TextField fx:id="txtUsername" focusTraversable="false" prefHeight="31.0" prefWidth="206.0" promptText="username" style="-fx-background-radius: 15; -fx-background-color: transparent;" styleClass="textfield" />
+               </children></HBox>
+            <HBox layoutX="104.0" layoutY="145.0" prefHeight="31.0" prefWidth="214.0" style="-fx-background-color: #ffffff; -fx-background-radius: 15;">
+               <children>
+                  <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../utils/images/icons/passwordIcon.png" />
+                     </image>
+                     <HBox.margin>
+                        <Insets left="11.0" top="6.0" />
+                     </HBox.margin>
+                  </ImageView>
+                  <PasswordField fx:id="txtPassword" focusTraversable="false" prefHeight="31.0" prefWidth="195.0" promptText="password" style="-fx-background-radius: 15; -fx-background-color: transparent;" />
+               </children>
+            </HBox>
+            <Label fx:id="title" layoutX="93.0" layoutY="44.0" text="Welcome, Please Sign In" />
+            <Button fx:id="btnLogin" layoutX="300.0" layoutY="238.0" mnemonicParsing="false" onAction="#loginAction" text="LogIn" />
+            <Text fx:id="createNewAccount" fill="WHITE" layoutX="191.0" layoutY="203.0" onMouseClicked="#createAccount" strokeType="OUTSIDE" strokeWidth="0.0" text="Create New Account" wrappingWidth="141.3828125">
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Text>
+            <Label fx:id="warningUsername" alignment="CENTER" layoutX="126.0" layoutY="67.0" prefHeight="30.0" prefWidth="152.0" style="-fx-background-color: #000000; -fx-background-radius: 8;" text="Username doesn't exist" textFill="WHITE" visible="false" />
+            <Label fx:id="warningPassword" alignment="CENTER" layoutX="126.0" layoutY="119.0" prefHeight="30.0" prefWidth="124.0" style="-fx-background-color: #000000; -fx-background-radius: 8;" text="Incorrect password" textFill="WHITE" visible="false" />
+         </children>
+      </AnchorPane>
+      <AnchorPane fx:id="titleBar" prefHeight="30.0" prefWidth="421.0">
+         <children>
+            <Button fx:id="btnClose" focusTraversable="false" layoutX="569.0" layoutY="1.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#closeAction" prefHeight="25.0" prefWidth="25.0" AnchorPane.rightAnchor="6.0">
+               <tooltip>
+                  <Tooltip height="20.0" text="Exit" width="15.0" wrapText="true" />
+               </tooltip>
+            </Button>
+            <Label fx:id="userID" layoutX="14.0" layoutY="6.0" text="Messenger Application" textFill="WHITE" />
+            <Button fx:id="btnMinimize" focusTraversable="false" layoutX="535.0" layoutY="1.0" maxHeight="25" maxWidth="25" minHeight="25.0" minWidth="25.0" mnemonicParsing="false" onAction="#minimizeAction" prefHeight="25.0" prefWidth="25.0" AnchorPane.rightAnchor="40.0">
+               <tooltip>
+                  <Tooltip height="20.0" text="Minimize" width="15.0" wrapText="true" />
+               </tooltip>
+            </Button>
+         </children>
+      </AnchorPane>
+   </children>
+</AnchorPane>

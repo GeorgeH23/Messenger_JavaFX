@@ -1,4 +1,4 @@
-package com.chatApplication.chatClient.gui;
+package com.chatApplication.chatClient.gui.utility;
 
 import com.chatApplication.chatClient.gui.controllers.MessagePaneController;
 import javafx.fxml.FXMLLoader;
@@ -19,14 +19,14 @@ public class MessagePane {
 
     public MessagePane(String login) {
         this.fxmlLoader = new FXMLLoader();
-        fxmlLoader.setLocation(getClass().getResource("/fxmlFiles/messagePaneView.fxml"));
+        fxmlLoader.setLocation(getClass().getResource("/views/messagePaneView.fxml"));
         try {
             this.root = fxmlLoader.load();
         } catch (IOException e) {
             e.printStackTrace();
         }
         this.controller = fxmlLoader.getController();
-        //root.getStylesheets().add(getClass().getResource("/utils/css/messageWindow.css").toString());
+        //root.getStylesheets().add(getClass().getResource("/utils/css/messageWindowStyling.css").toString());
         this.stage = new Stage();
         this.login = login;
 

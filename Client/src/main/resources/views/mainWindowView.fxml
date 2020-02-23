@@ -15,7 +15,7 @@
 <?import javafx.scene.shape.Circle?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane prefHeight="678.0" prefWidth="350.0" stylesheets="@../utils/css/fullpackstyling.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.chatApplication.chatClient.gui.controllers.MainWindowController">
+<AnchorPane prefHeight="678.0" prefWidth="350.0" stylesheets="@../utils/css/mainWindowStyling.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.chatApplication.chatClient.gui.controllers.MainWindowController">
    <children>
       <BorderPane fx:id="mainBorderPane" layoutY="98.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="580.0" prefWidth="350.0">
          <center>

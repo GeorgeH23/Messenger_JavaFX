@@ -1,5 +1,7 @@
 package com.chatApplication.chatClient.gui;
 
+import com.chatApplication.chatClient.gui.handlers.AudioHandler;
+import com.chatApplication.chatClient.gui.handlers.ImageHandler;
 import com.chatApplication.dataModel.DataSource;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -36,9 +38,9 @@ public class Main extends Application {
         audio.play("start", 0);
 
         primaryStage.setTitle("Messenger");
-        Scene root = new Scene((FXMLLoader.load(getClass().getResource("/fxmlFiles/loginWindowView.fxml"))), 420, 350);
+        Scene root = new Scene((FXMLLoader.load(getClass().getResource("/views/loginWindowView.fxml"))), 420, 350);
         // Add CSS stylesheet for the main window
-        //root.getStylesheets().add(getClass().getResource("/utils/css/Login.css").toString());
+        //root.getStylesheets().add(getClass().getResource("/utils/css/loginWindowStyling.css").toString());
         primaryStage.initStyle(StageStyle.TRANSPARENT);
         primaryStage.setScene(root);
         primaryStage.show();

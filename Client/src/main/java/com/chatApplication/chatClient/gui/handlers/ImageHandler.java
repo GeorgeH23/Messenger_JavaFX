@@ -1,4 +1,4 @@
-package com.chatApplication.chatClient.gui;
+package com.chatApplication.chatClient.gui.handlers;
 
 import com.chatApplication.dataModel.DataSource;
 import javafx.scene.image.Image;

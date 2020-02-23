@@ -19,7 +19,7 @@ public class UserListViewCellController {
 
 
     public UserListViewCellController() {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxmlFiles/userListViewCellView.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/userListViewCellView.fxml"));
         loader.setController(this);
         try {
             loader.load();

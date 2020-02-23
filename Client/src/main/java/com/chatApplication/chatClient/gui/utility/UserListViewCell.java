@@ -1,4 +1,4 @@
-package com.chatApplication.chatClient.gui;
+package com.chatApplication.chatClient.gui.utility;
 
 import com.chatApplication.chatClient.gui.controllers.UserListViewCellController;
 import javafx.scene.Node;
@@ -26,7 +26,7 @@ public class UserListViewCell extends ListCell<ChatUser> {
             setGraphic(null);
         } else {
 
-            /*FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxmlFiles/userListViewCellView.fxml"));
+            /*FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/userListViewCellView.fxml"));
             loader.setController(this);
             try {
                 loader.load();

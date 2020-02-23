@@ -1,8 +1,8 @@
 package com.chatApplication.chatClient.gui.controllers;
 
-import com.chatApplication.chatClient.gui.AudioHandler;
-import com.chatApplication.chatClient.gui.ImageHandler;
-import com.chatApplication.chatClient.gui.MessageType;
+import com.chatApplication.chatClient.gui.handlers.AudioHandler;
+import com.chatApplication.chatClient.gui.handlers.ImageHandler;
+import com.chatApplication.chatClient.gui.utility.MessageType;
 import com.chatApplication.chatClient.muc.ChatClient;
 import javafx.application.Platform;
 import javafx.event.EventHandler;

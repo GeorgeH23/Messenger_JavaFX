@@ -1,6 +1,10 @@
 package com.chatApplication.chatClient.gui.controllers;
 
-import com.chatApplication.chatClient.gui.*;
+import com.chatApplication.chatClient.gui.handlers.AudioHandler;
+import com.chatApplication.chatClient.gui.handlers.ImageHandler;
+import com.chatApplication.chatClient.gui.utility.ChatUser;
+import com.chatApplication.chatClient.gui.utility.MessagePane;
+import com.chatApplication.chatClient.gui.utility.UserListViewCell;
 import com.chatApplication.dataModel.DataSource;
 import com.chatApplication.chatClient.muc.ChatClient;
 import com.chatApplication.chatClient.muc.MessageListener;
@@ -176,8 +180,8 @@ public class MainWindowController implements UserStatusListener, MessageListener
         }
         CHAT_CLIENT.removeUserStatusListener(this);
         CHAT_CLIENT.removeMessageListener(this);
+        showNotification("", "goodbye");
         titleBar.getScene().getWindow().hide();
-
     }
 
     @FXML
@@ -261,6 +265,14 @@ public class MainWindowController implements UserStatusListener, MessageListener
             title = "New message notification";
             message = "You have a new message from " + login + ".";
             tray.setNotificationType(NotificationType.NOTICE);
+        } else if (notificationType.equals("welcome")) {
+            title = "Welcome \"" + this.loggedClientName.getText() + "\"!";
+            message = "It's nice to see you back online!";
+            tray.setNotificationType(NotificationType.SUCCESS);
+        } else if (notificationType.equals("goodbye")) {
+            title = "Goodbye \"" + this.loggedClientName.getText() + "\"!";
+            message = "We hope we'll see you back online soon!";
+            tray.setNotificationType(NotificationType.NOTICE);
         }
 
         // Display the notification on the screen.
@@ -294,6 +306,7 @@ public class MainWindowController implements UserStatusListener, MessageListener
 
     public void setLoggedClientName(String name) {
         loggedClientName.setText(name);
+        showNotification("", "welcome");
     }
 
     public void setLoggedClientPicture() {

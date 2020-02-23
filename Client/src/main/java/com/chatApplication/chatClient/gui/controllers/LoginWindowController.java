@@ -1,7 +1,7 @@
 package com.chatApplication.chatClient.gui.controllers;
 
-import com.chatApplication.chatClient.gui.AudioHandler;
-import com.chatApplication.chatClient.gui.ImageHandler;
+import com.chatApplication.chatClient.gui.handlers.AudioHandler;
+import com.chatApplication.chatClient.gui.handlers.ImageHandler;
 import com.chatApplication.dataModel.DataSource;
 import com.chatApplication.chatClient.muc.ChatClient;
 import javafx.animation.PauseTransition;
@@ -74,12 +74,12 @@ public class LoginWindowController implements Initializable {
         if (!txtUsername.getText().equals("") && !txtPassword.getText().equals("")) {
 
             FXMLLoader fxmlLoader = new FXMLLoader();
-            fxmlLoader.setLocation(getClass().getResource("/fxmlFiles/mainWindowView.fxml"));
+            fxmlLoader.setLocation(getClass().getResource("/views/mainWindowView.fxml"));
             Parent parent = fxmlLoader.load();
             MainWindowController controller = fxmlLoader.getController();
             controller.addListeners();
             Stage primaryStage = new Stage();
-            //parent.getStylesheets().add(getClass().getResource("/utils/css/fullpackstyling.css").toString());
+            //parent.getStylesheets().add(getClass().getResource("/utils/css/mainWindowStyling.css").toString());
             primaryStage.setScene(new Scene(parent));
             primaryStage.initStyle(StageStyle.TRANSPARENT);
 
@@ -136,9 +136,9 @@ public class LoginWindowController implements Initializable {
 
             Stage primaryStage = new Stage();
             primaryStage.setTitle("Messenger");
-            Scene root = new Scene((FXMLLoader.load(getClass().getResource("/fxmlFiles/createAccountView.fxml"))), 420, 450);
+            Scene root = new Scene((FXMLLoader.load(getClass().getResource("/views/createAccountView.fxml"))), 420, 450);
             // Add CSS stylesheet for the main window programmatically
-            // root.getStylesheets().add(getClass().getResource("/utils/css/createAccount.css").toString());
+            // root.getStylesheets().add(getClass().getResource("/utils/css/createAccountStyling.css").toString());
             primaryStage.setScene(root);
             primaryStage.initStyle(StageStyle.TRANSPARENT);
 
@@ -189,9 +189,9 @@ public class LoginWindowController implements Initializable {
     }
 
     private void setStyle(Node node, double duration) {
-        node.setStyle("-fx-prompt-text-fill: red; -fx-font-weight: bold;");
+        node.setStyle("-fx-prompt-text-fill: red; -fx-font-weight: bold; -fx-background-radius: 15; -fx-background-color: transparent");
         PauseTransition visible = new PauseTransition(Duration.seconds(duration));
-        visible.setOnFinished(event -> node.setStyle("-fx-prompt-text-fill: gray; -fx-font-weight: normal;"));
+        visible.setOnFinished(event -> node.setStyle("-fx-prompt-text-fill: gray; -fx-font-weight: normal; -fx-background-radius: 15; -fx-background-color: transparent"));
         visible.play();
     }
 }

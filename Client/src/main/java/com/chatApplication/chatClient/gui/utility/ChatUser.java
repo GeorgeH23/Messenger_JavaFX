@@ -1,5 +1,6 @@
-package com.chatApplication.chatClient.gui;
+package com.chatApplication.chatClient.gui.utility;
 
+import com.chatApplication.chatClient.gui.handlers.ImageHandler;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.image.Image;

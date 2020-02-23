@@ -50,62 +50,76 @@ public class ServerWorker extends Thread {
 
         BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
         String line;
-        while ((line = reader.readLine()) != null) {
-            // Split the line into individual tokens with help of Apache Comm3.9 Lib
-            // splits the line in multiple tokens based on the whitespace character
+        try {
+            while (((line = reader.readLine()) != null) && clientSocket.isConnected()) {
+                // Split the line into individual tokens with help of Apache Comm3.9 Lib
+                // splits the line in multiple tokens based on the whitespace character
 
-            String[] tokens = StringUtils.split(line);
-            if (tokens != null && tokens.length > 0) {
-                String cmd = tokens[0];
-                if ("logoff".equals(cmd) || "quit".equalsIgnoreCase(cmd)) {
-                    handleLogoff();
-                    break;
-                } else if ("availabilityChange".equals(cmd)) {
-                    String[] tokensMsg = StringUtils.split(line, null, 3);
-                    handleAvailabilityChange(tokensMsg);
-                } else if ("login".equalsIgnoreCase(cmd)) {
+                String[] tokens = StringUtils.split(line);
+                if (tokens != null && tokens.length > 0) {
+                    String cmd = tokens[0];
+                    if ("logoff".equals(cmd) || "quit".equalsIgnoreCase(cmd)) {
+                        handleLogoff();
+                        break;
+                    } else if ("availabilityChange".equals(cmd)) {
+                        String[] tokensMsg = StringUtils.split(line, null, 3);
+                        handleAvailabilityChange(tokensMsg);
+                    } else if ("login".equalsIgnoreCase(cmd)) {
 
-                    List<ServerWorker> workerList = server.getWorkerList();
-                    boolean equals = false;
+                        List<ServerWorker> workerList = server.getWorkerList();
+                        boolean equals = false;
 
-                    for (ServerWorker worker : workerList) {
-                        String login = worker.getLogin();
-                        if (login != null) {
-                            if (tokens[1].equals(login)) {
-                                equals = true;
-                                System.out.println("YOURE INNNNN");
-                                appendText("YOURE INNNNN");
+                        for (ServerWorker worker : workerList) {
+                            String login = worker.getLogin();
+                            if (login != null) {
+                                if (tokens[1].equals(login)) {
+                                    equals = true;
+                                    System.out.println("YOURE INNNNN");
+                                    appendText("YOURE INNNNN");
+                                }
                             }
                         }
-                    }
 
-                    if (equals) {
-                        String msg = "User already connected";
-                        outputStream.write(msg.getBytes());
-                        server.removeWorker(this);
-                        reader.close();
-                        inputStream.close();
-                        outputStream.close();
-                        clientSocket.close();
-                        break;
-                    } else {
-                        if (!handleLogin(outputStream, tokens)) {
+                        if (equals) {
+                            String msg = "User already connected";
+                            outputStream.write(msg.getBytes());
+                            server.removeWorker(this);
+                            reader.close();
+                            inputStream.close();
+                            outputStream.close();
+                            clientSocket.close();
                             break;
+                        } else {
+                            if (!handleLogin(outputStream, tokens)) {
+                                break;
+                            }
                         }
-                    }
 
-                } else if ("msg".equalsIgnoreCase(cmd)) {
-                    String[] tokensMsg = StringUtils.split(line, null, 3);
-                    handleMessage(tokensMsg);
-                } else if ("join".equalsIgnoreCase(cmd)) {
-                    handleJoin(tokens);
-                } else if ("leave".equalsIgnoreCase(cmd)) {
-                    handleLeave(tokens);
-                } else {
-                    String msg = "Unknown command: \"" + cmd + "\"\n";
-                    outputStream.write(msg.getBytes());
+                    } else if ("msg".equalsIgnoreCase(cmd)) {
+                        String[] tokensMsg = StringUtils.split(line, null, 3);
+                        handleMessage(tokensMsg);
+                    } else if ("join".equalsIgnoreCase(cmd)) {
+                        handleJoin(tokens);
+                    } else if ("leave".equalsIgnoreCase(cmd)) {
+                        handleLeave(tokens);
+                    } else {
+                        String msg = "Unknown command: \"" + cmd + "\"\n";
+                        outputStream.write(msg.getBytes());
+                    }
                 }
             }
+        } catch (Exception e) {
+            System.err.println("Connection was reset by the client.");
+            appendText("Connection was reset by the client.");
+        }
+        if (this.login != null) {
+            System.out.println("Connection lost with: \"" + getLogin() + "\".");
+            appendText("Connection lost with: \"" + getLogin() + "\".");
+            handleLogoff();
+        } else {
+            System.out.println("Connection lost for the client.");
+            appendText("Connection lost for the client.");
+            server.removeWorker(this);
         }
         clientSocket.close();
     }
@@ -204,7 +218,7 @@ public class ServerWorker extends Thread {
             String password = tokens[2];
 
             String msg;
-            String dbMessage = checkLoginDetails(login,password);
+            String dbMessage = checkLoginDetails(login, password);
             DATA_SOURCE.close();
 
             switch (dbMessage) {

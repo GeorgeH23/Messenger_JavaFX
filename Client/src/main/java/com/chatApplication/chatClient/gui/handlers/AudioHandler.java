@@ -1,4 +1,4 @@
-package com.chatApplication.chatClient.gui;
+package com.chatApplication.chatClient.gui.handlers;
 
 import javax.sound.sampled.*;
 import java.io.IOException;
