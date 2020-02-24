@@ -61,7 +61,7 @@ public class ServerWorker extends Thread {
                     if ("logoff".equals(cmd) || "quit".equalsIgnoreCase(cmd)) {
                         handleLogoff();
                         break;
-                    } else if ("availabilityChange".equals(cmd)) {
+                    } else if ("sts".equals(cmd)) {
                         String[] tokensMsg = StringUtils.split(line, null, 3);
                         handleAvailabilityChange(tokensMsg);
                     } else if ("login".equalsIgnoreCase(cmd)) {
@@ -102,6 +102,8 @@ public class ServerWorker extends Thread {
                         handleJoin(tokens);
                     } else if ("leave".equalsIgnoreCase(cmd)) {
                         handleLeave(tokens);
+                    } else if ("picture".equalsIgnoreCase(cmd)) {
+                        handlePictureChange(tokens);
                     } else {
                         String msg = "Unknown command: \"" + cmd + "\"\n";
                         outputStream.write(msg.getBytes());
@@ -113,8 +115,8 @@ public class ServerWorker extends Thread {
             appendText("Connection was reset by the client.");
         }
         if (this.login != null) {
-            System.out.println("Connection lost with: \"" + getLogin() + "\".");
-            appendText("Connection lost with: \"" + getLogin() + "\".");
+            System.out.println("Connection lost with: \"" + getLogin() + "\" or user logged off.");
+            appendText("Connection lost with: \"" + getLogin() + "\" or user logged off.");
             handleLogoff();
         } else {
             System.out.println("Connection lost for the client.");
@@ -207,6 +209,19 @@ public class ServerWorker extends Thread {
                             worker.send(message);
                         }
                     }
+                }
+            }
+        }
+    }
+
+    private void handlePictureChange(String[] tokens) throws IOException {
+        String message;
+        List<ServerWorker> workerList = server.getWorkerList();
+        for (ServerWorker worker : workerList) {
+            if (worker.getLogin() != null) {
+                if (!login.equals(worker.getLogin())) {
+                    message = "PictureUpdate: \"" + login + "\"\n";
+                    worker.send(message);
                 }
             }
         }

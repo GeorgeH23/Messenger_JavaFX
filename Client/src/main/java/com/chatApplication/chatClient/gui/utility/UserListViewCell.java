@@ -36,7 +36,6 @@ public class UserListViewCell extends ListCell<ChatUser> {
 
 
             setText(chatUser.getLogin());
-            System.out.println(chatUser.getUserImage().getValue());
             ccc.setUserImage(chatUser.getUserImage().getValue());
             ccc.setStatusImage(chatUser.getStatusImage().getValue());
             setGraphic(view);

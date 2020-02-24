@@ -12,6 +12,8 @@
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.shape.Arc?>
 <?import javafx.scene.shape.Circle?>
 <?import javafx.scene.text.Font?>
 
@@ -54,7 +56,7 @@
                   <Font name="Monospaced Bold" size="24.0" />
                </font>
             </Label>
-            <Circle fx:id="loggedClientPicture" fill="#f8f8f8" layoutX="36.0" layoutY="34.0" radius="32.0" stroke="BLACK" strokeType="INSIDE" />
+            <Circle fx:id="loggedClientPicture" fill="#f23b23" layoutX="36.0" layoutY="34.0" radius="32.0" stroke="BLACK" strokeType="INSIDE" />
             <MenuButton fx:id="statusMenu" layoutX="84.0" layoutY="32.0" mnemonicParsing="false" style="-fx-background-color: transparent;" styleClass="list-view" text="undefined" textFill="WHITE">
                <items>
                   <MenuItem mnemonicParsing="false" onAction="#changeStatusToAvailable" styleClass="list-view" text="Available">
@@ -98,7 +100,14 @@
                   <Font name="Monospaced Bold" size="14.0" />
                </font>
             </MenuButton>
+            <Arc fx:id="changeImageArc" fill="#e0edf8" layoutX="36.0" layoutY="34.0" length="180.0" opacity="0.8" radiusX="32.0" radiusY="32.0" startAngle="180.0" stroke="BLACK" strokeType="INSIDE" type="ROUND" />
+            <ImageView fx:id="changeImageIcon" fitHeight="20.0" fitWidth="20.0" layoutX="21.0" layoutY="38.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../utils/images/icons/addImage.png" />
+               </image>
+            </ImageView>
             <Circle fx:id="loggedUserStatusLight" fill="DODGERBLUE" layoutX="55.0" layoutY="57.0" radius="10.0" stroke="BLACK" strokeType="INSIDE" />
+            <Pane fx:id="changeImagePane" layoutX="4.0" layoutY="2.0" onMousePressed="#changePicture" prefHeight="64.0" prefWidth="64.0" style="-fx-background-color: transparent;" />
          </children>
       </AnchorPane>
    </children>

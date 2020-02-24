@@ -19,6 +19,7 @@ public class ChatClient {
     private List<UserStatusListener> userStatusListeners = new ArrayList<>();
     private List<MessageListener> messageListeners = new ArrayList<>();
     private List<UserAvailabilityListener> userAvailabilityListeners = new ArrayList<>();
+    private List<PictureChangeListener> pictureChangeListeners = new ArrayList<>();
 
     private static ChatClient instance = new ChatClient();
 
@@ -42,7 +43,14 @@ public class ChatClient {
     }
 
     public void availabilityChange(String newStatus) throws IOException {
-        String cmd = "availabilityChange " + newStatus + "\n";
+        String cmd = "sts " + newStatus + "\n";
+        if (serverOut != null) {
+            serverOut.write(cmd.getBytes());
+        }
+    }
+
+    public void pictureChange() throws IOException {
+        String cmd = "picture\n";
         if (serverOut != null) {
             serverOut.write(cmd.getBytes());
         }
@@ -102,6 +110,8 @@ public class ChatClient {
                         String[] tokensMsg = line.split(" ", 3);
                         //String[] tokensMsg = StringUtils.split(line, null, 3);
                         handleMessage(tokensMsg);
+                    } else if ("PictureUpdate".equalsIgnoreCase(cmd)) {
+                        handlePictureChange(tokens);
                     }
                 }
             }
@@ -130,6 +140,13 @@ public class ChatClient {
 
         for (UserAvailabilityListener listener : userAvailabilityListeners) {
             listener.availabilityStatus(login, newStatus);
+        }
+    }
+
+    private void handlePictureChange(String[] tokens) {
+        String login = tokens[1];
+        for (PictureChangeListener listener : pictureChangeListeners) {
+            listener.onPictureChanged(login);
         }
     }
 
@@ -213,5 +230,13 @@ public class ChatClient {
 
     public void removeUserAvailabilityListener(UserAvailabilityListener listener) {
         userAvailabilityListeners.remove(listener);
+    }
+
+    public void addPictureChangeListener(PictureChangeListener listener) {
+        pictureChangeListeners.add(listener);
+    }
+
+    public void removePictureChangeListener(PictureChangeListener listener) {
+        pictureChangeListeners.remove(listener);
     }
 }

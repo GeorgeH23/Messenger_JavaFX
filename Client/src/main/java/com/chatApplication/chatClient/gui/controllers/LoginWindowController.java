@@ -62,7 +62,7 @@ public class LoginWindowController implements Initializable {
 
     // This method handles the login process which is triggered by the "Login" button
     @FXML
-    public void loginAction() throws IOException{
+    public final void loginAction() throws IOException{
 
         if (txtUsername.getText().equals("")) {
             setStyle(txtUsername, 5.0);
@@ -131,7 +131,7 @@ public class LoginWindowController implements Initializable {
 
     // This method handles the new account creation process
     @FXML
-    public void createAccount(MouseEvent mouseEvent) throws IOException {
+    public final void createAccount(MouseEvent mouseEvent) throws IOException {
         if (mouseEvent.getButton() == MouseButton.PRIMARY){
 
             Stage primaryStage = new Stage();
@@ -151,7 +151,7 @@ public class LoginWindowController implements Initializable {
 
     // This method is responsible for closing the application when the "Exit" button is pressed
     @FXML
-    public void closeAction() {
+    public final void closeAction() {
         DataSource.getInstance().close();
         Platform.exit();
         System.exit(0);
@@ -159,7 +159,7 @@ public class LoginWindowController implements Initializable {
 
     // This method is responsible for minimizing the application window when the "Minimize" button is pressed
     @FXML
-    public void minimizeAction() {
+    public final void minimizeAction() {
         Stage stage = (Stage) btnMinimize.getScene().getWindow();
         stage.setIconified(true);
     }

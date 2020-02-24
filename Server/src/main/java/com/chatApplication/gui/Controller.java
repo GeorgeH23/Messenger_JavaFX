@@ -15,10 +15,9 @@ public class Controller implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-
     }
 
-    public TextArea getTextArea() {
+    public final TextArea getTextArea() {
         return this.textArea;
     }
 }

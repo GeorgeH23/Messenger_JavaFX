@@ -28,16 +28,15 @@ public class UserListViewCellController {
         }
     }
 
-    public void setUserImage(Image image) {
-        System.out.println(pictureCircle.toString());
-        pictureCircle.setFill(new ImagePattern(image));
+    public final void setUserImage(ImagePattern image) {
+        pictureCircle.setFill(image);
     }
 
-    public void setStatusImage(ImagePattern image) {
+    public final void setStatusImage(ImagePattern image) {
         statusCircle.setFill(image);
     }
 
-    public HBox gethBox() {
+    public final HBox gethBox() {
         return hBox;
     }
 }

@@ -11,13 +11,13 @@ public class ChatUser {
 
     private final String login;
     private final ObjectProperty<ImagePattern> statusImage;
-    private final ObjectProperty<Image> userImage;
+    private final ObjectProperty<ImagePattern> userImage;
 
     public ChatUser(final String login, final String picturePath, String userStatus) {
         this.login = login;
         this.statusImage = new SimpleObjectProperty<>();
         this.userImage = new SimpleObjectProperty<>();
-        this.userImage.setValue(new Image(new File(picturePath).toURI().toString()));
+        setUserImage(picturePath);
         setStatusImage(userStatus);
     }
 
@@ -45,11 +45,25 @@ public class ChatUser {
         }
     }
 
+    public final void setUserImage(String path) {
+        try {
+            Image image = new Image(new File(path).toURI().toString(), true);
+            image.progressProperty().addListener((obs, ov, nv) -> {
+                if (nv.equals(1.0)) {
+                    this.userImage.setValue(new ImagePattern(image));
+                }
+            });
+        } catch (Exception e) {
+            this.userImage.setValue(ImageHandler.getInstance().getUnknownUserImage());
+            e.printStackTrace();
+        }
+    }
+
     public final ObjectProperty<ImagePattern> getStatusImage() {
         return statusImage;
     }
 
-    public final ObjectProperty<Image> getUserImage() {
+    public final ObjectProperty<ImagePattern> getUserImage() {
         return userImage;
     }
 }

@@ -3,13 +3,11 @@ package com.chatApplication.chatClient.gui.controllers;
 import com.chatApplication.chatClient.gui.handlers.AudioHandler;
 import com.chatApplication.chatClient.gui.handlers.ImageHandler;
 import com.chatApplication.chatClient.gui.utility.ChatUser;
+import com.chatApplication.chatClient.gui.utility.FileChooserGenerator;
 import com.chatApplication.chatClient.gui.utility.MessagePane;
 import com.chatApplication.chatClient.gui.utility.UserListViewCell;
+import com.chatApplication.chatClient.muc.*;
 import com.chatApplication.dataModel.DataSource;
-import com.chatApplication.chatClient.muc.ChatClient;
-import com.chatApplication.chatClient.muc.MessageListener;
-import com.chatApplication.chatClient.muc.UserAvailabilityListener;
-import com.chatApplication.chatClient.muc.UserStatusListener;
 import javafx.application.Platform;
 import javafx.beans.Observable;
 import javafx.collections.FXCollections;
@@ -18,27 +16,34 @@ import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.effect.DropShadow;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.ImagePattern;
+import javafx.scene.shape.Arc;
 import javafx.scene.shape.Circle;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import tray.animations.AnimationType;
 import tray.notification.NotificationType;
 import tray.notification.TrayNotification;
+
+import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 
-public class MainWindowController implements UserStatusListener, MessageListener, UserAvailabilityListener {
+public class MainWindowController implements UserStatusListener, MessageListener, UserAvailabilityListener, PictureChangeListener {
 
     private static final ChatClient CHAT_CLIENT = ChatClient.getInstance();
     private final Map<String, MessagePane> messagePanes = new HashMap<>();
-    private ObservableList<ChatUser> list;
+    private ObservableList<ChatUser> loggedClientsList;
     private long startTime;
     private double initialX;
     private double initialY;
@@ -58,6 +63,12 @@ public class MainWindowController implements UserStatusListener, MessageListener
     private MenuButton statusMenu;
     @FXML
     private Circle loggedUserStatusLight;
+    @FXML
+    private Pane changeImagePane;
+    @FXML
+    private Arc changeImageArc;
+    @FXML
+    private ImageView changeImageIcon;
 
     public void initialize() {
 
@@ -66,15 +77,24 @@ public class MainWindowController implements UserStatusListener, MessageListener
         audio.load("/utils/sounds/online.wav", "online");
         audio.load("/utils/sounds/message.wav", "message");
         audio.load("/utils/sounds/click.wav", "click");
-
         addDraggableNode(titleBar);
+        changeImageArc.setStroke(Color.TRANSPARENT);
+        changeImageArc.setVisible(false);
+        changeImageIcon.setVisible(false);
+
+        changeImagePane.setOnMouseEntered(mouseEvent -> {
+            changeImageArc.setVisible(true);
+            changeImageIcon.setVisible(true);
+        });
+        changeImagePane.setOnMouseExited(mouseEvent -> {
+            changeImageArc.setVisible(false);
+            changeImageIcon.setVisible(false);
+        });
 
         startTime = System.currentTimeMillis();
-
         titledPane.setEffect(new DropShadow(10, Color.BLUE));
-
-        list = FXCollections.observableArrayList( chatUser -> new Observable[] {chatUser.getStatusImage(), chatUser.getUserImage()});
-        clients.setItems(list);
+        loggedClientsList = FXCollections.observableArrayList(chatUser -> new Observable[] {chatUser.getStatusImage(), chatUser.getUserImage()});
+        clients.setItems(loggedClientsList);
         clients.getItems().sort(Comparator.comparing(o -> o.getLogin().toLowerCase()));
         clients.setCellFactory(userListView -> new UserListViewCell());
         clients.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
@@ -84,7 +104,6 @@ public class MainWindowController implements UserStatusListener, MessageListener
     public void onMessage(String fromLogin, String msgBody) {
 
         String processedMsg = msgBody.replaceAll("##NL##", "\n");
-
         String login = fromLogin.replaceAll("\\p{Punct}", "");
 
         Platform.runLater(() -> {
@@ -93,17 +112,21 @@ public class MainWindowController implements UserStatusListener, MessageListener
 
             if (!messagePanes.containsKey(login)) {
                 try {
-                    createMessagePane(login);
-                    messagePanes.get(login).getController().setUserID(login);
-                    messagePanes.get(login).getController().onMessage(fromLogin, processedMsg);
+                    createNewMessagePane(login);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-            } else {
-                messagePanes.get(login).getStage().show();
-                messagePanes.get(login).getController().setUserID(login);
-                messagePanes.get(login).getController().onMessage(fromLogin, processedMsg);
             }
+            MessagePaneController messagePaneController = messagePanes.get(login).getController();
+            messagePaneController.setUserID(login);
+            for (ChatUser user : loggedClientsList) {
+                if (user.getLogin().equals(login)) {
+                    messagePaneController.setUserImage(user.getUserImage().getValue());
+                    break;
+                }
+            }
+            messagePaneController.onMessage(fromLogin, processedMsg);
+            messagePanes.get(login).getStage().show();
         });
     }
 
@@ -114,7 +137,7 @@ public class MainWindowController implements UserStatusListener, MessageListener
         String path = DataSource.getInstance().queryUserPicture(username);
 
         Platform.runLater(() -> {
-            list.add(new ChatUser(username, path, userStatus));
+            loggedClientsList.add(new ChatUser(username, path, userStatus));
             clients.getItems().sort(Comparator.comparing(o -> o.getLogin().toLowerCase()));
             showNotification(login, "logon", timeDifference);
         });
@@ -126,12 +149,12 @@ public class MainWindowController implements UserStatusListener, MessageListener
         Platform.runLater(() -> {
             String username = login.replaceAll("\\p{Punct}", "");
             ChatUser user = null;
-            for (ChatUser listUser : list) {
+            for (ChatUser listUser : loggedClientsList) {
                 if (listUser.getLogin().equals(username)) {
                     user = listUser;
                 }
             }
-            list.remove(user);
+            loggedClientsList.remove(user);
 
             showNotification(login, "logoff");
         });
@@ -141,7 +164,7 @@ public class MainWindowController implements UserStatusListener, MessageListener
     public void availabilityStatus(String login, String newStatus) {
         Platform.runLater(() -> {
             String username = login.replaceAll("\\p{Punct}", "");
-            for (ChatUser user : list) {
+            for (ChatUser user : loggedClientsList) {
                 if (user.getLogin().equals(username)) {
                     user.setStatusImage(newStatus);
                     break;
@@ -150,10 +173,21 @@ public class MainWindowController implements UserStatusListener, MessageListener
         });
     }
 
+    @Override
+    public void onPictureChanged(String login) {
+        String username = login.replaceAll("\\p{Punct}", "");
+        String path = DataSource.getInstance().queryUserPicture(username);
+        for (ChatUser user : loggedClientsList) {
+            if (user.getLogin().equals(username)) {
+                user.setUserImage(path);
+            }
+        }
+    }
+
     @FXML
     private void handleClickListView(MouseEvent mouseEvent) throws IOException {
 
-        // If the item on the list is double clicked.
+        // If the item on the loggedClientsList is double clicked.
         if ((mouseEvent.getButton() == MouseButton.PRIMARY) && (mouseEvent.getClickCount() > 1) && (mouseEvent.getTarget() != null)) {
             String login = clients.getSelectionModel().getSelectedItem().getLogin();
             audio.play("click", 0);
@@ -168,7 +202,7 @@ public class MainWindowController implements UserStatusListener, MessageListener
                     return;
                 }
                 // Otherwise create a new message pane for the current login.
-                createMessagePane(login);
+                createNewMessagePane(login);
             }
         }
     }
@@ -216,6 +250,27 @@ public class MainWindowController implements UserStatusListener, MessageListener
         CHAT_CLIENT.availabilityChange("away");
         statusMenu.setText("Away");
         setLoggedUserStatusLight(ImageHandler.getInstance().getAwayStatusImage());
+    }
+
+    @FXML
+    private void changePicture() throws IOException {
+        File newImage = FileChooserGenerator.showOpenFile(loggedClientPicture.getScene().getWindow());
+        if (newImage != null) {
+            DataSource.getInstance().updateUserPicture(this.loggedClientName.getText(), newImage.getAbsolutePath());
+            try {
+                Image image = new Image(newImage.toURI().toURL().toString(), true);
+                image.progressProperty().addListener((obs, ov, nv) -> {
+                    if (nv.equals(1.0)) {
+                        ImageHandler.getInstance().changeCurrentLoggedUserImage(image);
+                        loggedClientPicture.setFill(ImageHandler.getInstance().getCurrentLoggedUserImage());
+                    }
+                });
+            } catch (MalformedURLException e) {
+                setLoggedClientPicture();
+                e.printStackTrace();
+            }
+            CHAT_CLIENT.pictureChange();
+        }
     }
 
     // This function is used for moving the MessagePanes on the screen.
@@ -282,38 +337,44 @@ public class MainWindowController implements UserStatusListener, MessageListener
         tray.showAndDismiss(Duration.seconds(3));
     }
 
-    private void createMessagePane(String login) throws IOException {
+    private void createNewMessagePane(String login) throws IOException {
 
         // Create a new MessagePane window.
         MessagePane pane = new MessagePane(login);
 
-        // Add the new MessagePane window to the list of opened MessagePane windows.
+        // Add the new MessagePane window to the loggedClientsList of opened MessagePane windows.
         messagePanes.put(login, pane);
         System.out.println(messagePanes.keySet());
     }
 
-    public void removeListeners() {
+    private void setLoggedUserStatusLight(ImagePattern path) {
+        loggedUserStatusLight.setFill(path);
+    }
+
+    public final void removeListeners() {
         CHAT_CLIENT.removeUserStatusListener(this);
         CHAT_CLIENT.removeMessageListener(this);
         CHAT_CLIENT.removeUserAvailabilityListener(this);
+        CHAT_CLIENT.removePictureChangeListener(this);
     }
 
-    public void addListeners() {
+    public final void addListeners() {
         CHAT_CLIENT.addUserStatusListener(this);
         CHAT_CLIENT.addMessageListener(this);
         CHAT_CLIENT.addUserAvailabilityListener(this);
+        CHAT_CLIENT.addPictureChangeListener(this);
     }
 
-    public void setLoggedClientName(String name) {
+    public final void setLoggedClientName(String name) {
         loggedClientName.setText(name);
         showNotification("", "welcome");
     }
 
-    public void setLoggedClientPicture() {
+    public final void setLoggedClientPicture() {
         loggedClientPicture.setFill(ImageHandler.getInstance().getCurrentLoggedUserImage());
     }
 
-    public void setLoggedClientStatus(String loggedUserStatus) {
+    public final void setLoggedClientStatus(String loggedUserStatus) {
         switch (loggedUserStatus) {
             case "available" :
                 statusMenu.setText("Available");
@@ -336,9 +397,5 @@ public class MainWindowController implements UserStatusListener, MessageListener
                 setLoggedUserStatusLight(ImageHandler.getInstance().getUnknownStatusImage());
                 break;
         }
-    }
-
-    private void setLoggedUserStatusLight(ImagePattern path) {
-        loggedUserStatusLight.setFill(path);
     }
 }

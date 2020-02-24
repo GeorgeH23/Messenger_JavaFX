@@ -15,6 +15,7 @@ public class ImageHandler {
     private Image dndStatusImage;
     private Image unknownStatusImage;
     private Image currentLoggedUserImage;
+    private Image unknownUserImage;
 
     private static ImageHandler instance = new ImageHandler();
 
@@ -33,6 +34,7 @@ public class ImageHandler {
             awayStatusImage = new Image(getClass().getResource("/utils/images/icons/away.png").toURI().toURL().toString(), true);
             dndStatusImage = new Image(getClass().getResource("/utils/images/icons/dnd.png").toURI().toURL().toString(), true);
             unknownStatusImage = new Image(getClass().getResource("/utils/images/icons/unknown.png").toURI().toURL().toString(), true);
+            unknownUserImage = new Image(getClass().getResource("/utils/images/users/user.png").toURI().toURL().toString(), true);
         } catch (MalformedURLException | URISyntaxException e) {
             e.printStackTrace();
         }
@@ -52,6 +54,10 @@ public class ImageHandler {
         } catch (MalformedURLException | URISyntaxException e) {
             e.printStackTrace();
         }
+    }
+
+    public void changeCurrentLoggedUserImage(Image newImage) {
+        currentLoggedUserImage = newImage;
     }
 
     public ImagePattern getAvailableStatusImage() {
@@ -76,5 +82,9 @@ public class ImageHandler {
 
     public ImagePattern getCurrentLoggedUserImage() {
         return new ImagePattern(currentLoggedUserImage);
+    }
+
+    public ImagePattern getUnknownUserImage() {
+        return new ImagePattern(unknownUserImage);
     }
 }

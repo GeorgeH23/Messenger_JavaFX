@@ -38,10 +38,14 @@ public class DataSource {
     private static final String QUERY_PICTURE = "SELECT " + COLUMN_PICTURE + " FROM " + TABLE_USERS + " WHERE "
             + COLUMN_USERNAME + " = ?";
 
+    private static final String UPDATE_PICTURE = "UPDATE " + TABLE_USERS + " SET " + COLUMN_PICTURE + " = ? " + " WHERE "
+            + COLUMN_USERNAME + " = ?";
+
     private PreparedStatement queryUsersCheckExists;
     private PreparedStatement queryLogin;
     private PreparedStatement inserUser;
     private PreparedStatement queryPicture;
+    private PreparedStatement updatePicture;
 
     private Connection connection;
 
@@ -61,6 +65,7 @@ public class DataSource {
             queryLogin = connection.prepareStatement(QUERY_LOGIN);
             inserUser = connection.prepareStatement(INSERT_USER);
             queryPicture = connection.prepareStatement(QUERY_PICTURE);
+            updatePicture = connection.prepareStatement(UPDATE_PICTURE);
 
             System.out.println("Successfully connected to the Database.");
             return true;
@@ -84,6 +89,9 @@ public class DataSource {
             }
             if (queryPicture != null) {
                 queryPicture.close();
+            }
+            if (updatePicture != null) {
+                updatePicture.close();
             }
             if (connection != null) {
                 connection.close();
@@ -188,6 +196,21 @@ public class DataSource {
         }
     }
 
+    public boolean updateUserPicture(String username, String imagePath) {
+        try {
+            updatePicture.setBytes(1, readFile(imagePath));
+            updatePicture.setString(2, username);
+
+            int results = updatePicture.executeUpdate();
+
+            return results == 1;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
     private byte[] readFile(String path) {
         ByteArrayOutputStream bos = null;
         try {
@@ -212,7 +235,7 @@ public class DataSource {
 
     public static void main(String[] args) throws IOException, SQLException, NoSuchAlgorithmException {
         DataSource.getInstance().open();
-
+            //DataSource.getInstance().updateUserPicture("frank", "C:\\Users\\gharpa\\Desktop\\PICS\\bub.png");
         DataSource.getInstance().close();
     }
 }

@@ -1,5 +1,6 @@
 package com.chatApplication.chatClient.gui.controllers;
 
+import com.chatApplication.chatClient.gui.utility.FileChooserGenerator;
 import com.chatApplication.common.NewUser;
 import com.chatApplication.common.PasswordHasher;
 import com.chatApplication.dataModel.DataSource;
@@ -78,11 +79,10 @@ public class CreateAccountController implements Initializable {
                 showWarning(warningContactNumber, 3.0, "Should contain only numbers 0-9");
             }
         });
-
     }
 
     @FXML
-    public void createAccount() {
+    public final void createAccount() {
         if (txtUsername.getText().equals("")){
             if (!currentShowingWarnings.contains(warningUsername.getId())) {
                 currentShowingWarnings.add(warningUsername.getId());
@@ -148,20 +148,20 @@ public class CreateAccountController implements Initializable {
     }
 
     @FXML
-    public void btnBrowseAction() {
-        File file = showOpenFile();
+    public final void btnBrowseAction() {
+        File file = FileChooserGenerator.showOpenFile(txtPath.getScene().getWindow());
         if(file != null) {
             txtPath.setText(file.getAbsolutePath());
         }
     }
 
     @FXML
-    public void closeAction() {
+    public final void closeAction() {
         ((Stage)txtPassword.getScene().getWindow()).close();
     }
 
     @FXML
-    public void minimizeAction() {
+    public final void minimizeAction() {
         Stage stage = (Stage) btnMinimize.getScene().getWindow();
         stage.setIconified(true);
     }
@@ -192,13 +192,5 @@ public class CreateAccountController implements Initializable {
             currentShowingWarnings.remove(node.getId());
         });
         visible.play();
-    }
-
-    private File showOpenFile(){
-        FileChooser fileChooser=new FileChooser();
-        fileChooser.setTitle("Student Photo");
-        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("JPG (*.jpg)", "*.jpg"));
-        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("PNG (*.png)", "*.png"));
-        return fileChooser.showOpenDialog(txtUsername.getScene().getWindow());
     }
 }

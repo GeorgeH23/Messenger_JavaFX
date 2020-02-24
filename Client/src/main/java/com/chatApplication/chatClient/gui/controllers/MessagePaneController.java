@@ -37,6 +37,7 @@ public class MessagePaneController {
     private double initialX;
     private double initialY;
     private AudioHandler audio;
+    private ImagePattern userImage;
 
     @FXML
     private Button btnClose;
@@ -72,33 +73,20 @@ public class MessagePaneController {
         );
     }
 
-    public void inititializePane(String paneTitle){
-        addDraggableNode(titleBar);
-        userID.setText(paneTitle.replaceAll("\\p{Punct}", ""));
-        txtMsg.deselect();
-        btnSend.requestFocus();
-    }
-
-    public void resize(){
-        txtMsg.setPrefSize( btnClose.getScene().getWindow().getWidth() - 220, 50);
-        titleBar.setPrefWidth(rootPane.getScene().getWindow().getWidth()- 15);
-
-    }
-
     @FXML
-    public void closeAction() {
+    public final void closeAction() {
         //Runtime.getRuntime().exit(0);
         ((Stage)btnClose.getScene().getWindow()).hide();
     }
 
     @FXML
-    public void minimizeAction() {
+    public final void minimizeAction() {
         Stage stage = (Stage) btnMinimize.getScene().getWindow();
         stage.setIconified(true);
     }
 
     @FXML
-    public void sendAction(){
+    public final void sendAction(){
 
         String sendTo = userID.getText();
         String message = txtMsg.getText().trim();
@@ -117,39 +105,6 @@ public class MessagePaneController {
             audio.play("sent", 0);
 
             txtMsg.clear();
-        }
-    }
-
-    // This function is used for moving the MessagePanes on the screen.
-    private void addDraggableNode(final Node node) {
-
-        node.setOnMousePressed(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent me) {
-
-                if (me.getButton() != MouseButton.MIDDLE) {
-                    initialX = me.getSceneX();
-                    initialY = me.getSceneY();
-                }
-            }
-        });
-
-        node.setOnMouseDragged(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent me) {
-                if (me.getButton() != MouseButton.MIDDLE) {
-                    node.getScene().getWindow().setX(me.getScreenX() - initialX);
-                    node.getScene().getWindow().setY(me.getScreenY() - initialY);
-                }
-            }
-        });
-    }
-
-    public void onMessage(String fromLogin, String msgBody) {
-
-        if (fromLogin.replaceAll("\\p{Punct}", "").equals(userID.getText())) {
-
-            createMessage(msgBody, MessageType.RECEIVED);
         }
     }
 
@@ -173,13 +128,10 @@ public class MessagePaneController {
             txtName = new Text(getCurrentLocalDateTimeStamp() + "\n" + userID.getText() + "\n");
 
             try {
-                File file = new File(System.getProperty("user.home") + File.separator + "Documents" + File.separator +
-                        "MessengerApplication" + File.separator + userID.getText() + ".jpg");
-                if (file.isFile()) {
-                    img.setFill(new ImagePattern(new Image(file.toURI().toURL().toString())));
+                if (userImage != null) {
+                    img.setFill(userImage);
                 } else {
-                    String filePath = new File(getClass().getResource("/utils/images/users/user.png").getFile()).toURI().toString();
-                    img.setFill(new ImagePattern(new Image(filePath)));
+                    img.setFill(ImageHandler.getInstance().getUnknownUserImage());
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -213,11 +165,61 @@ public class MessagePaneController {
         Platform.runLater(() -> chatBox.getChildren().addAll(hbox));
     }
 
-    void setUserID(String userId){
-        userID.setText(userId);
+    // This method is used for moving the MessagePanes on the screen.
+    private void addDraggableNode(final Node node) {
+
+        node.setOnMousePressed(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent me) {
+
+                if (me.getButton() != MouseButton.MIDDLE) {
+                    initialX = me.getSceneX();
+                    initialY = me.getSceneY();
+                }
+            }
+        });
+
+        node.setOnMouseDragged(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent me) {
+                if (me.getButton() != MouseButton.MIDDLE) {
+                    node.getScene().getWindow().setX(me.getScreenX() - initialX);
+                    node.getScene().getWindow().setY(me.getScreenY() - initialY);
+                }
+            }
+        });
     }
 
     private String getCurrentLocalDateTimeStamp() {
         return LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
+    }
+
+    public final void onMessage(String fromLogin, String msgBody) {
+
+        if (fromLogin.replaceAll("\\p{Punct}", "").equals(userID.getText())) {
+
+            createMessage(msgBody, MessageType.RECEIVED);
+        }
+    }
+
+    public final void inititializePane(String paneTitle){
+        addDraggableNode(titleBar);
+        userID.setText(paneTitle.replaceAll("\\p{Punct}", ""));
+        txtMsg.deselect();
+        btnSend.requestFocus();
+    }
+
+    public final void resize(){
+        txtMsg.setPrefSize( btnClose.getScene().getWindow().getWidth() - 220, 50);
+        titleBar.setPrefWidth(rootPane.getScene().getWindow().getWidth()- 15);
+
+    }
+
+    public final void setUserID(String userId){
+        userID.setText(userId);
+    }
+
+    public void setUserImage(ImagePattern userImage) {
+        this.userImage = userImage;
     }
 }
