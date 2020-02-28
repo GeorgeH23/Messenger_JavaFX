@@ -1,6 +1,7 @@
 package com.chatApplication.chatClient.gui.controllers;
 
 import com.chatApplication.chatClient.gui.utility.FileChooserGenerator;
+import com.chatApplication.chatClient.gui.handlers.ImageCroppingHandler;
 import com.chatApplication.common.NewUser;
 import com.chatApplication.common.PasswordHasher;
 import com.chatApplication.dataModel.DataSource;
@@ -16,7 +17,6 @@ import javafx.scene.control.TextField;
 import javafx.scene.input.ContextMenuEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.AnchorPane;
-import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import java.io.File;
@@ -32,6 +32,7 @@ public class CreateAccountController implements Initializable {
     private double initialY;
     private List<String> currentShowingWarnings;
     private final DataSource DATA_SOURCE = DataSource.getInstance();
+    private String path;
 
     @FXML
     private AnchorPane titleBar;
@@ -150,8 +151,15 @@ public class CreateAccountController implements Initializable {
     @FXML
     public final void btnBrowseAction() {
         File file = FileChooserGenerator.showOpenFile(txtPath.getScene().getWindow());
+
         if(file != null) {
-            txtPath.setText(file.getAbsolutePath());
+            Stage stage = new Stage();
+            stage.setOnHiding(windowEvent -> {
+                this.path = ImageCroppingHandler.getInstance().getCroppedImagePath();
+                System.out.println(this.path);
+                txtPath.setText(this.path);
+            });
+            ImageCroppingHandler.getInstance().pictureCropper(stage, file.getAbsolutePath());
         }
     }
 

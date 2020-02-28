@@ -227,6 +227,7 @@ public class DataSource {
             for (int len; (len = input.read(buffer)) != -1;){
                 bos.write(buffer, 0, len);
             }
+            input.close();
         } catch (IOException e) {
             e.printStackTrace();
         }

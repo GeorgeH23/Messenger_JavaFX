@@ -3,6 +3,7 @@ module Client {
     requires javafx.base;
     requires javafx.graphics;
     requires javafx.controls;
+    requires javafx.swing;
     requires sqlite.jdbc;
     requires java.desktop;
     requires org.apache.commons.lang3;

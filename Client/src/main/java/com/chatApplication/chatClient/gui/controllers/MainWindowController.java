@@ -1,6 +1,7 @@
 package com.chatApplication.chatClient.gui.controllers;
 
 import com.chatApplication.chatClient.gui.handlers.AudioHandler;
+import com.chatApplication.chatClient.gui.handlers.ImageCroppingHandler;
 import com.chatApplication.chatClient.gui.handlers.ImageHandler;
 import com.chatApplication.chatClient.gui.utility.ChatUser;
 import com.chatApplication.chatClient.gui.utility.FileChooserGenerator;
@@ -48,6 +49,7 @@ public class MainWindowController implements UserStatusListener, MessageListener
     private double initialX;
     private double initialY;
     private AudioHandler audio;
+    private String path;
 
     @FXML
     private ListView<ChatUser> clients;
@@ -253,23 +255,40 @@ public class MainWindowController implements UserStatusListener, MessageListener
     }
 
     @FXML
-    private void changePicture() throws IOException {
+    private void changePicture() {
         File newImage = FileChooserGenerator.showOpenFile(loggedClientPicture.getScene().getWindow());
+
         if (newImage != null) {
-            DataSource.getInstance().updateUserPicture(this.loggedClientName.getText(), newImage.getAbsolutePath());
-            try {
-                Image image = new Image(newImage.toURI().toURL().toString(), true);
-                image.progressProperty().addListener((obs, ov, nv) -> {
-                    if (nv.equals(1.0)) {
-                        ImageHandler.getInstance().changeCurrentLoggedUserImage(image);
-                        loggedClientPicture.setFill(ImageHandler.getInstance().getCurrentLoggedUserImage());
+            Stage stage = new Stage();
+            stage.setOnHiding(windowEvent -> {
+                this.path = ImageCroppingHandler.getInstance().getCroppedImagePath();
+                System.out.println(this.path);
+
+                if (this.path != null) {
+                    DataSource.getInstance().updateUserPicture(this.loggedClientName.getText(), path);
+                    try {
+                        File file = new File(path);
+                        file.deleteOnExit();
+
+                        Image image = new Image(file.toURI().toURL().toString(), true);
+                        image.progressProperty().addListener((obs, ov, nv) -> {
+                            if (nv.equals(1.0)) {
+                                ImageHandler.getInstance().changeCurrentLoggedUserImage(image);
+                                loggedClientPicture.setFill(ImageHandler.getInstance().getCurrentLoggedUserImage());
+                            }
+                        });
+                    } catch (MalformedURLException e) {
+                        setLoggedClientPicture();
+                        e.printStackTrace();
                     }
-                });
-            } catch (MalformedURLException e) {
-                setLoggedClientPicture();
-                e.printStackTrace();
-            }
-            CHAT_CLIENT.pictureChange();
+                    try {
+                        CHAT_CLIENT.pictureChange();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+            ImageCroppingHandler.getInstance().pictureCropper(stage, newImage.getAbsolutePath());
         }
     }
 
