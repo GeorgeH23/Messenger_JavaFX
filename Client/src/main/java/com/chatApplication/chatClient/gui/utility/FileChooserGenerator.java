@@ -2,7 +2,6 @@ package com.chatApplication.chatClient.gui.utility;
 
 import javafx.stage.FileChooser;
 import javafx.stage.Window;
-
 import java.io.File;
 
 public class FileChooserGenerator {

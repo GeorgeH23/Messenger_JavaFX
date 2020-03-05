@@ -9,7 +9,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane fx:id="rootPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="430.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.chatApplication.chatClient.gui.controllers.MessagePaneController" stylesheets="@../utils/css/messageWindowStyling.css">
+<AnchorPane fx:id="rootPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="430.0" prefWidth="600.0" stylesheets="@../utils/css/messagePaneStyling.css" xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.chatApplication.chatClient.gui.controllers.MessagePaneController">
     <children>
         <AnchorPane layoutY="30.0" prefHeight="370.0" prefWidth="600.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="30.0">
             <children>
@@ -20,7 +20,7 @@
                                 <Font size="14.0" />
                             </font>
                         </TextArea>
-                        <Button fx:id="btnSend" accessibleRole="PARENT" layoutX="453.0" layoutY="303.0" mnemonicParsing="false" onAction="#sendAction" prefHeight="50.0" prefWidth="50.0" AnchorPane.bottomAnchor="15" AnchorPane.rightAnchor="100" >
+                        <Button fx:id="btnSend" accessibleRole="PARENT" layoutX="453.0" layoutY="303.0" mnemonicParsing="false" onAction="#sendAction" prefHeight="50.0" prefWidth="50.0" AnchorPane.bottomAnchor="15" AnchorPane.rightAnchor="100">
                             <tooltip>
                                 <Tooltip height="20.0" text="Send Message" width="15.0" wrapText="true" />
                             </tooltip>
@@ -40,7 +40,7 @@
                         <Tooltip height="20.0" text="Logout" width="15.0" wrapText="true" />
                     </tooltip>
                 </Button>
-                <Label fx:id="userID" layoutX="14.0" layoutY="6.0" text="Public Chat - FX" textFill="WHITE" />
+                <Label fx:id="userID" layoutX="14.0" layoutY="6.0" text="Messenger Application" textFill="WHITE" />
                 <Button fx:id="btnMinimize" layoutX="535.0" layoutY="1.0" maxHeight="25" maxWidth="25" minHeight="25.0" minWidth="25.0" mnemonicParsing="false" onAction="#minimizeAction" prefHeight="25.0" prefWidth="25.0" AnchorPane.rightAnchor="40.0">
                     <tooltip>
                         <Tooltip height="20.0" text="Minimize" width="15.0" wrapText="true" />

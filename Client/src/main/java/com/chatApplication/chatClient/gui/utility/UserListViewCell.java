@@ -4,7 +4,6 @@ import com.chatApplication.chatClient.gui.controllers.UserListViewCellController
 import javafx.scene.Node;
 import javafx.scene.control.ListCell;
 
-
 public class UserListViewCell extends ListCell<ChatUser> {
 
     /*@FXML

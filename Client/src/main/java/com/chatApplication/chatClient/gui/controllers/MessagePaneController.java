@@ -25,7 +25,6 @@ import javafx.scene.shape.Circle;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 import javafx.stage.Stage;
-import java.io.File;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -57,7 +56,6 @@ public class MessagePaneController {
     private VBox chatBox;
     @FXML
     private Button btnMinimize;
-
     @FXML
     private void initialize() {
 

@@ -1,6 +1,7 @@
 package com.chatApplication.chatClient.gui.controllers;
 
 import com.chatApplication.chatClient.gui.handlers.AudioHandler;
+import com.chatApplication.chatClient.gui.handlers.ImageCroppingHandler;
 import com.chatApplication.chatClient.gui.handlers.ImageHandler;
 import com.chatApplication.dataModel.DataSource;
 import com.chatApplication.chatClient.muc.ChatClient;
@@ -24,7 +25,6 @@ import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.util.Duration;
-
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -105,6 +105,10 @@ public class LoginWindowController implements Initializable {
                                 ChatClient.getInstance().logoff();
                                 audio.play("logoff", 0);
                                 txtPassword.clear();
+                                Stage stage = ImageCroppingHandler.getInstance().getPrimaryStage();
+                                if (stage != null) {
+                                    stage.close();
+                                }
                                 ((Stage) txtPassword.getScene().getWindow()).show();
                             } catch (IOException e) {
                                 e.printStackTrace();
@@ -142,10 +146,16 @@ public class LoginWindowController implements Initializable {
             primaryStage.setScene(root);
             primaryStage.initStyle(StageStyle.TRANSPARENT);
 
-            ((Stage)txtPassword.getScene().getWindow()).hide();
+            txtPassword.getScene().getWindow().hide();
 
             primaryStage.show();
-            primaryStage.setOnHiding(event -> ((Stage)txtPassword.getScene().getWindow()).show());
+            primaryStage.setOnHiding(event -> {
+                Stage stage = ImageCroppingHandler.getInstance().getPrimaryStage();
+                if (stage != null) {
+                    stage.close();
+                }
+                ((Stage)txtPassword.getScene().getWindow()).show();
+            });
         }
     }
 

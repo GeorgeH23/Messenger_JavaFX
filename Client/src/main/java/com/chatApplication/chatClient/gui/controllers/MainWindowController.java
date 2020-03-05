@@ -32,7 +32,6 @@ import javafx.util.Duration;
 import tray.animations.AnimationType;
 import tray.notification.NotificationType;
 import tray.notification.TrayNotification;
-
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;

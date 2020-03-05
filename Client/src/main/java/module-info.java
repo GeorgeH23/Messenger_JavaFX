@@ -13,7 +13,9 @@ module Client {
 
     opens com.chatApplication.chatClient.gui;
     opens com.chatApplication.chatClient.gui.controllers;
+    opens com.chatApplication.chatClient.gui.handlers;
 
     exports com.chatApplication.chatClient.gui;
     exports com.chatApplication.chatClient.gui.controllers;
+    exports com.chatApplication.chatClient.gui.handlers;
 }

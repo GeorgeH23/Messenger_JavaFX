@@ -6,7 +6,6 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
-
 import java.io.IOException;
 
 public class MessagePane {
@@ -26,7 +25,7 @@ public class MessagePane {
             e.printStackTrace();
         }
         this.controller = fxmlLoader.getController();
-        //root.getStylesheets().add(getClass().getResource("/utils/css/messageWindowStyling.css").toString());
+        //root.getStylesheets().add(getClass().getResource("/utils/css/messagePaneStyling.css").toString());
         this.stage = new Stage();
         this.login = login;
 
