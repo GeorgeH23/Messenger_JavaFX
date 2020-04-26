@@ -1,18 +1,15 @@
 package com.chatApplication.chatClient.gui.controllers;
 
+import com.chatApplication.chatClient.gui.BaseController;
+import com.chatApplication.chatClient.gui.ChatManager;
+import com.chatApplication.chatClient.gui.ViewFactory;
 import com.chatApplication.chatClient.gui.handlers.AudioHandler;
 import com.chatApplication.chatClient.gui.handlers.ImageCroppingHandler;
 import com.chatApplication.chatClient.gui.handlers.ImageHandler;
 import com.chatApplication.chatClient.gui.utility.ChatUser;
 import com.chatApplication.chatClient.gui.utility.FileChooserGenerator;
-import com.chatApplication.chatClient.gui.utility.MessagePane;
 import com.chatApplication.chatClient.gui.utility.UserListViewCell;
-import com.chatApplication.chatClient.muc.*;
-import com.chatApplication.dataModel.DataSource;
 import javafx.application.Platform;
-import javafx.beans.Observable;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.*;
@@ -36,19 +33,17 @@ import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Map;
 
-public class MainWindowController implements UserStatusListener, MessageListener, UserAvailabilityListener, PictureChangeListener {
+public class MainWindowController extends BaseController {
 
-    private static final ChatClient CHAT_CLIENT = ChatClient.getInstance();
-    private final Map<String, MessagePane> messagePanes = new HashMap<>();
-    private ObservableList<ChatUser> loggedClientsList;
     private long startTime;
     private double initialX;
     private double initialY;
     private AudioHandler audio;
     private String path;
+    private ViewFactory viewFactory;
+    private ChatManager chatManager;
+    private ImageCroppingHandler imageCroppingHandler;
 
     @FXML
     private ListView<ChatUser> clients;
@@ -71,18 +66,25 @@ public class MainWindowController implements UserStatusListener, MessageListener
     @FXML
     private ImageView changeImageIcon;
 
-    public void initialize() {
+    public MainWindowController() {
+        super();
+        this.chatManager = super.chatManager;
+        this.viewFactory = super.viewFactory;
+        this.imageCroppingHandler = ImageCroppingHandler.getInstance();
+    }
 
+    public void initialize() {
+        addDraggableNode(titleBar);
         audio = AudioHandler.getInstance();
-        audio.load("/utils/sounds/offline.wav", "offline");
         audio.load("/utils/sounds/online.wav", "online");
+        audio.load("/utils/sounds/offline.wav", "offline");
         audio.load("/utils/sounds/message.wav", "message");
         audio.load("/utils/sounds/click.wav", "click");
-        addDraggableNode(titleBar);
+        audio.load("/utils/sounds/chimeup.wav", "login");
+        audio.load("/utils/sounds/door.wav", "logoff");
         changeImageArc.setStroke(Color.TRANSPARENT);
         changeImageArc.setVisible(false);
         changeImageIcon.setVisible(false);
-
         changeImagePane.setOnMouseEntered(mouseEvent -> {
             changeImageArc.setVisible(true);
             changeImageIcon.setVisible(true);
@@ -91,166 +93,90 @@ public class MainWindowController implements UserStatusListener, MessageListener
             changeImageArc.setVisible(false);
             changeImageIcon.setVisible(false);
         });
-
         startTime = System.currentTimeMillis();
         titledPane.setEffect(new DropShadow(10, Color.BLUE));
-        loggedClientsList = FXCollections.observableArrayList(chatUser -> new Observable[] {chatUser.getStatusImage(), chatUser.getUserImage()});
-        clients.setItems(loggedClientsList);
+        clients.setItems(chatManager.getLoggedClientsList());
         clients.getItems().sort(Comparator.comparing(o -> o.getLogin().toLowerCase()));
         clients.setCellFactory(userListView -> new UserListViewCell());
         clients.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
     }
 
-    @Override
-    public void onMessage(String fromLogin, String msgBody) {
-
-        String processedMsg = msgBody.replaceAll("##NL##", "\n");
-        String login = fromLogin.replaceAll("\\p{Punct}", "");
-
+    public void onMessage(String fromLogin, String message) {
         Platform.runLater(() -> {
-            audio.play("message", 0);
+            viewFactory.showMessagePaneWindow(fromLogin);
+            MessagePaneController controller = (MessagePaneController) viewFactory.getController(fromLogin);
+            for (ChatUser user : chatManager.getLoggedClientsList()) {
+                if (user.getLogin().equals(fromLogin)) {
+                    controller.setUserImage(user.getUserImage().getValue());
+                    break;
+                }
+            }
+            controller.onMessage(fromLogin, message);
             showNotification(fromLogin, "message");
-
-            if (!messagePanes.containsKey(login)) {
-                try {
-                    createNewMessagePane(login);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-            MessagePaneController messagePaneController = messagePanes.get(login).getController();
-            messagePaneController.setUserID(login);
-            for (ChatUser user : loggedClientsList) {
-                if (user.getLogin().equals(login)) {
-                    messagePaneController.setUserImage(user.getUserImage().getValue());
-                    break;
-                }
-            }
-            messagePaneController.onMessage(fromLogin, processedMsg);
-            messagePanes.get(login).getStage().show();
         });
     }
 
-    @Override
-    public void online(String login, String userStatus) {
-        String username = login.replaceAll("\\p{Punct}", "");
+    public void online(String login) {
         long timeDifference = System.currentTimeMillis() - startTime;
-        String path = DataSource.getInstance().queryUserPicture(username);
-
-        Platform.runLater(() -> {
-            loggedClientsList.add(new ChatUser(username, path, userStatus));
-            clients.getItems().sort(Comparator.comparing(o -> o.getLogin().toLowerCase()));
-            showNotification(login, "logon", timeDifference);
-        });
+        clients.getItems().sort(Comparator.comparing(o -> o.getLogin().toLowerCase()));
+        showNotification(login, "logon", timeDifference);
     }
 
-    @Override
     public void offline(String login) {
-
-        Platform.runLater(() -> {
-            String username = login.replaceAll("\\p{Punct}", "");
-            ChatUser user = null;
-            for (ChatUser listUser : loggedClientsList) {
-                if (listUser.getLogin().equals(username)) {
-                    user = listUser;
-                }
-            }
-            loggedClientsList.remove(user);
-
-            showNotification(login, "logoff");
-        });
-    }
-
-    @Override
-    public void availabilityStatus(String login, String newStatus) {
-        Platform.runLater(() -> {
-            String username = login.replaceAll("\\p{Punct}", "");
-            for (ChatUser user : loggedClientsList) {
-                if (user.getLogin().equals(username)) {
-                    user.setStatusImage(newStatus);
-                    break;
-                }
-            }
-        });
-    }
-
-    @Override
-    public void onPictureChanged(String login) {
-        String username = login.replaceAll("\\p{Punct}", "");
-        String path = DataSource.getInstance().queryUserPicture(username);
-        for (ChatUser user : loggedClientsList) {
-            if (user.getLogin().equals(username)) {
-                user.setUserImage(path);
-            }
-        }
+        showNotification(login, "logoff");
     }
 
     @FXML
     private void handleClickListView(MouseEvent mouseEvent) throws IOException {
-
         // If the item on the loggedClientsList is double clicked.
         if ((mouseEvent.getButton() == MouseButton.PRIMARY) && (mouseEvent.getClickCount() > 1) && (mouseEvent.getTarget() != null)) {
             String login = clients.getSelectionModel().getSelectedItem().getLogin();
             audio.play("click", 0);
-
-            // If a message pane is already open for the current login bring it to front.
-            if (login != null) {
-                if (messagePanes.containsKey(login)) {
-                    Stage stage = messagePanes.get(login).getStage();
-                    stage.show();
-                    stage.toFront();
-                    stage.setIconified(false);
-                    return;
-                }
-                // Otherwise create a new message pane for the current login.
-                createNewMessagePane(login);
-            }
+            viewFactory.showMessagePaneWindow(login);
         }
-    }
-
-    @FXML
-    private void closeAction() {
-        for (MessagePane pane : messagePanes.values()) {
-            pane.getStage().close();
-        }
-        CHAT_CLIENT.removeUserStatusListener(this);
-        CHAT_CLIENT.removeMessageListener(this);
-        showNotification("", "goodbye");
-        titleBar.getScene().getWindow().hide();
     }
 
     @FXML
     private void minimizeAction() {
         Stage stage = (Stage) titleBar.getScene().getWindow();
-        stage.setIconified(true);
+        viewFactory.minimizeStage(stage);
     }
 
     @FXML
-    private void changeStatusToAvailable() throws IOException {
-        CHAT_CLIENT.availabilityChange("available");
+    private void closeAction() {
+        showNotification("", "goodbye");
+        Stage stage = (Stage) titleBar.getScene().getWindow();
+        viewFactory.closeStage(stage);
+        chatManager.removeListeners();
+        chatManager.logOffClient();
+    }
+
+    @FXML
+    private void changeStatusToAvailable() {
+        chatManager.changeLoggedUserStatus("available");
         statusMenu.setText("Available");
-        setLoggedUserStatusLight(ImageHandler.getInstance().getAvailableStatusImage());
+        setLoggedUserStatusLight(ImageHandler.getInstance().getStatusImage("available"));
     }
 
     @FXML
-    private void changeStatusToBusy() throws IOException {
-        CHAT_CLIENT.availabilityChange("busy");
+    private void changeStatusToBusy() {
+        chatManager.changeLoggedUserStatus("busy");
         statusMenu.setText("Busy");
-        setLoggedUserStatusLight(ImageHandler.getInstance().getBusyStatusImage());
+        setLoggedUserStatusLight(ImageHandler.getInstance().getStatusImage("busy"));
     }
 
     @FXML
-    private void changeStatusToDoNotDisturb() throws IOException {
-        CHAT_CLIENT.availabilityChange("dnd");
+    private void changeStatusToDoNotDisturb() {
+        chatManager.changeLoggedUserStatus("dnd");
         statusMenu.setText("Do Not Disturb");
-        setLoggedUserStatusLight(ImageHandler.getInstance().getDndStatusImage());
+        setLoggedUserStatusLight(ImageHandler.getInstance().getStatusImage("dnd"));
     }
 
     @FXML
-    private void changeStatusToAway() throws IOException {
-        CHAT_CLIENT.availabilityChange("away");
+    private void changeStatusToAway() {
+        chatManager.changeLoggedUserStatus("away");
         statusMenu.setText("Away");
-        setLoggedUserStatusLight(ImageHandler.getInstance().getAwayStatusImage());
+        setLoggedUserStatusLight(ImageHandler.getInstance().getStatusImage("away"));
     }
 
     @FXML
@@ -258,13 +184,13 @@ public class MainWindowController implements UserStatusListener, MessageListener
         File newImage = FileChooserGenerator.showOpenFile(loggedClientPicture.getScene().getWindow());
 
         if (newImage != null) {
-            Stage stage = new Stage();
+            Stage stage = viewFactory.showImageCroppingWindow();
+            imageCroppingHandler.pictureCropper(newImage.getAbsolutePath());
             stage.setOnHiding(windowEvent -> {
-                this.path = ImageCroppingHandler.getInstance().getCroppedImagePath();
+                this.path = imageCroppingHandler.getCroppedImagePath();
                 System.out.println(this.path);
-
                 if (this.path != null) {
-                    DataSource.getInstance().updateUserPicture(this.loggedClientName.getText(), path);
+                    chatManager.pictureChange(loggedClientName.getText(), path);
                     try {
                         File file = new File(path);
                         file.deleteOnExit();
@@ -280,20 +206,14 @@ public class MainWindowController implements UserStatusListener, MessageListener
                         setLoggedClientPicture();
                         e.printStackTrace();
                     }
-                    try {
-                        CHAT_CLIENT.pictureChange();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
                 }
             });
-            ImageCroppingHandler.getInstance().pictureCropper(stage, newImage.getAbsolutePath());
+
         }
     }
 
     // This function is used for moving the MessagePanes on the screen.
     private void addDraggableNode(final Node node) {
-
         node.setOnMousePressed(event -> {
             if (event.getButton() != MouseButton.MIDDLE) {
                 initialX = event.getSceneX();
@@ -309,43 +229,52 @@ public class MainWindowController implements UserStatusListener, MessageListener
     }
 
     private void showNotification(String login, String notificationType, long... time) {
-
         TrayNotification tray = new TrayNotification();
         AnimationType animation = AnimationType.POPUP;
         String title = null;
         String message = null;
 
         // Set the online/login notification depending on the login time.
-        if (notificationType.equals("logon")) {
-            title = "Logon notification";
-            if (time[0] > 200) {
-                message = login + " just logged in.";
-                audio.play("online", 0);
-            } else {
-                return;
-                //message = login + " is online.";
-            }
-            tray.setNotificationType(NotificationType.SUCCESS);
-
+        switch (notificationType) {
+            case "logon":
+                title = "Logon notification";
+                if (time[0] > 500) {
+                    message = login + " just logged in.";
+                    audio.play("online", 0);
+                } else {
+                    return;
+                    //message = login + " is online.";
+                }
+                tray.setNotificationType(NotificationType.SUCCESS);
+                break;
             // Set the logoff notification.
-        } else if (notificationType.equals("logoff")) {
-            title = "Logoff notification";
-            message = login + " just logged off.";
-            tray.setNotificationType(NotificationType.ERROR);
-            audio.play("offline", 0);
+            case "logoff":
+                title = "Logoff notification";
+                message = login + " just logged off.";
+                tray.setNotificationType(NotificationType.ERROR);
+                audio.play("offline", 0);
+                break;
             // Set the new message notification.
-        } else if (notificationType.equals("message")) {
-            title = "New message notification";
-            message = "You have a new message from " + login + ".";
-            tray.setNotificationType(NotificationType.NOTICE);
-        } else if (notificationType.equals("welcome")) {
-            title = "Welcome \"" + this.loggedClientName.getText() + "\"!";
-            message = "It's nice to see you back online!";
-            tray.setNotificationType(NotificationType.SUCCESS);
-        } else if (notificationType.equals("goodbye")) {
-            title = "Goodbye \"" + this.loggedClientName.getText() + "\"!";
-            message = "We hope we'll see you back online soon!";
-            tray.setNotificationType(NotificationType.NOTICE);
+            case "message":
+                title = "New message notification";
+                message = "You have a new message from " + login + ".";
+                tray.setNotificationType(NotificationType.NOTICE);
+                audio.play("message", 0);
+                break;
+            // Set the welcome notification.
+            case "welcome":
+                title = "Welcome \"" + this.loggedClientName.getText() + "\"!";
+                message = "It's nice to see you back online!";
+                tray.setNotificationType(NotificationType.SUCCESS);
+                audio.play("login", 0);
+                break;
+            // Set the good bye notification.
+            case "goodbye":
+                title = "Goodbye \"" + this.loggedClientName.getText() + "\"!";
+                message = "We hope we'll see you back online soon!";
+                tray.setNotificationType(NotificationType.NOTICE);
+                audio.play("logoff", 0);
+                break;
         }
 
         // Display the notification on the screen.
@@ -355,32 +284,8 @@ public class MainWindowController implements UserStatusListener, MessageListener
         tray.showAndDismiss(Duration.seconds(3));
     }
 
-    private void createNewMessagePane(String login) throws IOException {
-
-        // Create a new MessagePane window.
-        MessagePane pane = new MessagePane(login);
-
-        // Add the new MessagePane window to the loggedClientsList of opened MessagePane windows.
-        messagePanes.put(login, pane);
-        System.out.println(messagePanes.keySet());
-    }
-
-    private void setLoggedUserStatusLight(ImagePattern path) {
+    public void setLoggedUserStatusLight(ImagePattern path) {
         loggedUserStatusLight.setFill(path);
-    }
-
-    public final void removeListeners() {
-        CHAT_CLIENT.removeUserStatusListener(this);
-        CHAT_CLIENT.removeMessageListener(this);
-        CHAT_CLIENT.removeUserAvailabilityListener(this);
-        CHAT_CLIENT.removePictureChangeListener(this);
-    }
-
-    public final void addListeners() {
-        CHAT_CLIENT.addUserStatusListener(this);
-        CHAT_CLIENT.addMessageListener(this);
-        CHAT_CLIENT.addUserAvailabilityListener(this);
-        CHAT_CLIENT.addPictureChangeListener(this);
     }
 
     public final void setLoggedClientName(String name) {
@@ -392,28 +297,24 @@ public class MainWindowController implements UserStatusListener, MessageListener
         loggedClientPicture.setFill(ImageHandler.getInstance().getCurrentLoggedUserImage());
     }
 
-    public final void setLoggedClientStatus(String loggedUserStatus) {
-        switch (loggedUserStatus) {
+    public final void setLoggedClientStatus(String loggedUserStatusText) {
+        switch (loggedUserStatusText) {
             case "available" :
-                statusMenu.setText("Available");
-                setLoggedUserStatusLight(ImageHandler.getInstance().getAvailableStatusImage());
+                loggedUserStatusText = "Available";
                 break;
             case "busy" :
-                statusMenu.setText("Busy");
-                setLoggedUserStatusLight(ImageHandler.getInstance().getBusyStatusImage());
+                loggedUserStatusText = "Busy";
                 break;
             case "away" :
-                statusMenu.setText("Away");
-                setLoggedUserStatusLight(ImageHandler.getInstance().getAwayStatusImage());
+                loggedUserStatusText = "Away";
                 break;
             case "dnd" :
-                statusMenu.setText("Do Not Disturb");
-                setLoggedUserStatusLight(ImageHandler.getInstance().getDndStatusImage());
+                loggedUserStatusText = "Do Not Disturb";
                 break;
             default:
-                statusMenu.setText("Unknown Status");
-                setLoggedUserStatusLight(ImageHandler.getInstance().getUnknownStatusImage());
+                loggedUserStatusText = "Unknown Status";
                 break;
         }
+        statusMenu.setText(loggedUserStatusText);
     }
 }

@@ -36,14 +36,23 @@
 }
 
 .context-menu {
+    -fx-effect: dropshadow(three-pass-box, purple, 10, 0, 0, 0);
     -fx-background-color: linear-gradient(to left, #4776e6, #8e54e9);
     -fx-background-insets: 0, 1, 2;
     -fx-background-radius: 0 6 6 6, 0 5 5 5, 0 4 4 4;
     -fx-padding: 0.333333em 0.083333em 0.666667em 0.083333em; /* 4 1 8 1 */
 }
+
 .menu-item .label {
-    -fx-font: 10pt "Monospaced";
+     -fx-font: 10pt "Monospaced";
+     -fx-font-weight: bold;
+}
+
+.menu-item:hover {
+    -fx-background-color: linear-gradient(to right, #4776e6, #8e54e9);
     -fx-font-weight: bold;
+    -fx-scale-x: 1.07;
+    -fx-scale-y: 1.07;
 }
 
 ///////////////////////////////

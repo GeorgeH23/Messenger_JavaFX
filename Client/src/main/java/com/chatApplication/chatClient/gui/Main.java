@@ -2,18 +2,14 @@ package com.chatApplication.chatClient.gui;
 
 import com.chatApplication.chatClient.gui.handlers.AudioHandler;
 import com.chatApplication.chatClient.gui.handlers.ImageHandler;
-import com.chatApplication.dataModel.DataSource;
 import javafx.application.Application;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Scene;
 import javafx.stage.Stage;
-import javafx.stage.StageStyle;
 import java.io.File;
 
 public class Main extends Application {
 
     @Override
-    public void start(Stage primaryStage) throws Exception{
+    public void start(Stage primaryStage) {
 
         String path1 = new File(System.getProperty("user.home")).getAbsolutePath() + File.separator + "Documents" +
                 File.separator + "MessengerApplication";
@@ -29,20 +25,13 @@ public class Main extends Application {
             directory.mkdir();
         }
 
-        DataSource.getInstance().open();
+        ChatManager.getInstance().openDatabaseConnection();
         ImageHandler.getInstance().loadStatusImages();
+        ViewFactory.getInstance().showLoginWindow();
 
         AudioHandler audio = AudioHandler.getInstance();
         audio.load("/utils/sounds/type.wav", "start");
         audio.play("start", 0);
-
-        primaryStage.setTitle("Messenger");
-        Scene root = new Scene((FXMLLoader.load(getClass().getResource("/views/loginWindowView.fxml"))), 420, 350);
-        // Add CSS stylesheet for the main window
-        //root.getStylesheets().add(getClass().getResource("/utils/css/loginWindowStyling.css").toString());
-        primaryStage.initStyle(StageStyle.TRANSPARENT);
-        primaryStage.setScene(root);
-        primaryStage.show();
     }
 
     public static void main(String[] args) {

@@ -17,12 +17,15 @@ public class ImageHandler {
     private Image currentLoggedUserImage;
     private Image unknownUserImage;
 
-    private static ImageHandler instance = new ImageHandler();
+    private static ImageHandler instance;
 
     private ImageHandler() {
     }
 
     public static ImageHandler getInstance() {
+        if (instance == null) {
+            instance = new ImageHandler();
+        }
         return instance;
     }
 
@@ -60,7 +63,7 @@ public class ImageHandler {
         currentLoggedUserImage = newImage;
     }
 
-    public ImagePattern getAvailableStatusImage() {
+    /*public ImagePattern getAvailableStatusImage() {
         return new ImagePattern(availableStatusImage);
     }
 
@@ -78,6 +81,21 @@ public class ImageHandler {
 
     public ImagePattern getUnknownStatusImage() {
         return new ImagePattern(unknownStatusImage);
+    }*/
+
+    public ImagePattern getStatusImage(String status) {
+        switch (status) {
+            case "available" :
+                return new ImagePattern(availableStatusImage);
+            case "busy" :
+                return new ImagePattern(busyStatusImage);
+            case "away" :
+                return new ImagePattern(awayStatusImage);
+            case "dnd" :
+                return new ImagePattern(dndStatusImage);
+            default:
+                return new ImagePattern(unknownStatusImage);
+        }
     }
 
     public ImagePattern getCurrentLoggedUserImage() {

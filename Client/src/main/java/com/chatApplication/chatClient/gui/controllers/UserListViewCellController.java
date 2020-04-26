@@ -1,5 +1,6 @@
 package com.chatApplication.chatClient.gui.controllers;
 
+import com.chatApplication.chatClient.gui.ViewFactory;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.layout.HBox;
@@ -8,13 +9,13 @@ import javafx.scene.shape.Circle;
 import java.io.IOException;
 
 public class UserListViewCellController {
+
     @FXML
     private HBox hBox;
     @FXML
     private Circle pictureCircle;
     @FXML
     private Circle statusCircle;
-
 
     public UserListViewCellController() {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/userListViewCellView.fxml"));
@@ -34,7 +35,7 @@ public class UserListViewCellController {
         statusCircle.setFill(image);
     }
 
-    public final HBox gethBox() {
+    public final HBox getBox() {
         return hBox;
     }
 }

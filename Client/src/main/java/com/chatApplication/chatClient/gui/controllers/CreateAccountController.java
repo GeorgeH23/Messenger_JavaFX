@@ -1,10 +1,10 @@
 package com.chatApplication.chatClient.gui.controllers;
 
+import com.chatApplication.chatClient.gui.BaseController;
+import com.chatApplication.chatClient.gui.ChatManager;
+import com.chatApplication.chatClient.gui.ViewFactory;
 import com.chatApplication.chatClient.gui.utility.FileChooserGenerator;
 import com.chatApplication.chatClient.gui.handlers.ImageCroppingHandler;
-import com.chatApplication.common.NewUser;
-import com.chatApplication.common.PasswordHasher;
-import com.chatApplication.dataModel.DataSource;
 import javafx.animation.PauseTransition;
 import javafx.event.Event;
 import javafx.fxml.FXML;
@@ -21,18 +21,18 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 import java.io.File;
 import java.net.URL;
-import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 
-public class CreateAccountController implements Initializable {
+public class CreateAccountController extends BaseController implements Initializable {
 
+    private ViewFactory viewFactory;
+    private ChatManager chatManager;
+    private ImageCroppingHandler imageCroppingHandler;
     private double initialX;
     private double initialY;
     private List<String> currentShowingWarnings;
-    private final DataSource DATA_SOURCE = DataSource.getInstance();
-    private String path;
 
     @FXML
     private AnchorPane titleBar;
@@ -57,6 +57,13 @@ public class CreateAccountController implements Initializable {
     @FXML
     private Label successNote;
 
+    public CreateAccountController() {
+        super();
+        this.viewFactory = super.viewFactory;
+        this.chatManager = super.chatManager;
+        this.imageCroppingHandler = ImageCroppingHandler.getInstance();
+    }
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         addDraggableNode(titleBar);
@@ -66,7 +73,6 @@ public class CreateAccountController implements Initializable {
         txtPasswordConfirm.addEventFilter(ContextMenuEvent.CONTEXT_MENU_REQUESTED, Event::consume);
         txtContact.addEventFilter(ContextMenuEvent.CONTEXT_MENU_REQUESTED, Event::consume);
         txtPath.addEventFilter(ContextMenuEvent.CONTEXT_MENU_REQUESTED, Event::consume);
-
         currentShowingWarnings = new ArrayList<>();
 
         // In order to allow only numbers 0-9 to be typed for the contact number
@@ -119,70 +125,50 @@ public class CreateAccountController implements Initializable {
             }
             return;
         }
-
-        String password = "";
-        try {
-            password = PasswordHasher.getInstance().generateHash(txtPassword.getText());
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        }
-
-        NewUser newUser = new NewUser(txtUsername.getText(), password, txtContact.getText(), txtPath.getText());
-
-        String response = DATA_SOURCE.insertNewUser(newUser);
-
-        if (response.equals("New Account Created")) {
-            DATA_SOURCE.queryUserPicture(txtUsername.getText());
-            System.out.println("New Account Created");
-
-            successNote.setVisible(true);
-            PauseTransition visible = new PauseTransition(Duration.seconds(3.0));
-            visible.setOnFinished(event -> {
-                successNote.setVisible(false);
-                ((Stage) txtPassword.getScene().getWindow()).close();
-            });
-            visible.play();
-        }
-        if (response.equals("Username exists")) {
-            System.out.println("Username exists");
+        String response = chatManager.createNewAccount(txtUsername.getText(), txtPassword.getText(), txtContact.getText(), txtPath.getText());
+        if (response.equalsIgnoreCase("Success")) {
+            setupSuccessLabel("Account Successfully Created!","-fx-text-fill: #02d30d; -fx-background-color: transparent;");
+        } else if (response.equalsIgnoreCase("Username Exists")) {
+            setupSuccessLabel("Username Exists!","-fx-text-fill: black;");
+        } else if (response.equalsIgnoreCase("Error")) {
+            setupSuccessLabel("Error!","-fx-text-fill: red; -fx-background-color: white;");
         }
     }
 
     @FXML
     public final void btnBrowseAction() {
         File file = FileChooserGenerator.showOpenFile(txtPath.getScene().getWindow());
-
         if(file != null) {
-            Stage stage = new Stage();
+            Stage stage = viewFactory.showImageCroppingWindow();
+            imageCroppingHandler.pictureCropper(file.getAbsolutePath());
+
             stage.setOnHiding(windowEvent -> {
-                this.path = ImageCroppingHandler.getInstance().getCroppedImagePath();
-                System.out.println(this.path);
-                txtPath.setText(this.path);
+                String path = imageCroppingHandler.getCroppedImagePath();
+                System.out.println(path);
+                txtPath.setText(path);
             });
-            ImageCroppingHandler.getInstance().pictureCropper(stage, file.getAbsolutePath());
         }
     }
 
     @FXML
     public final void closeAction() {
-        ((Stage)txtPassword.getScene().getWindow()).close();
+        Stage stage = (Stage)txtPassword.getScene().getWindow();
+        viewFactory.closeStage(stage);
     }
 
     @FXML
     public final void minimizeAction() {
         Stage stage = (Stage) btnMinimize.getScene().getWindow();
-        stage.setIconified(true);
+        viewFactory.minimizeStage(stage);
     }
 
     // This function is used for moving the MessagePanes on the screen.
     private void addDraggableNode(final Node node) {
-
         node.setOnMousePressed(event -> {
             if (event.getButton() != MouseButton.MIDDLE) {
                 initialX = event.getSceneX();
                 initialY = event.getSceneY();
             }});
-
         node.setOnMouseDragged(event -> {
             if (event.getButton() != MouseButton.MIDDLE) {
                 node.getScene().getWindow().setX(event.getScreenX() - initialX);
@@ -200,5 +186,24 @@ public class CreateAccountController implements Initializable {
             currentShowingWarnings.remove(node.getId());
         });
         visible.play();
+    }
+
+    private void setupSuccessLabel(String text, String style) {
+        successNote.setText(text);
+        successNote.setStyle(style);
+        successNote.setVisible(true);
+        PauseTransition visible = new PauseTransition(Duration.seconds(3.0));
+        visible.setOnFinished(event -> {
+            successNote.setVisible(false);
+            if (text.equalsIgnoreCase("Account Successfully Created!")) {
+                Stage stage = (Stage) txtPassword.getScene().getWindow();
+                viewFactory.closeStage(stage);
+            }
+        });
+        visible.play();
+    }
+
+    public void setTxtPath(String path) {
+        this.txtPath.setText(path);
     }
 }

@@ -13,8 +13,8 @@ public class UserListViewCell extends ListCell<ChatUser> {
     @FXML
     private Circle statusCircle;*/
 
-    private final UserListViewCellController ccc = new UserListViewCellController();
-    private final Node view = ccc.gethBox();
+    private final UserListViewCellController controller = new UserListViewCellController();
+    private final Node view = controller.getBox();
 
     @Override
     protected void updateItem(ChatUser chatUser, boolean empty) {
@@ -33,10 +33,9 @@ public class UserListViewCell extends ListCell<ChatUser> {
                 e.printStackTrace();
             }*/
 
-
             setText(chatUser.getLogin());
-            ccc.setUserImage(chatUser.getUserImage().getValue());
-            ccc.setStatusImage(chatUser.getStatusImage().getValue());
+            controller.setUserImage(chatUser.getUserImage().getValue());
+            controller.setStatusImage(chatUser.getStatusImage().getValue());
             setGraphic(view);
 
             /*setText(chatUser.getLogin());
@@ -44,7 +43,6 @@ public class UserListViewCell extends ListCell<ChatUser> {
             pictureCircle.setFill(new ImagePattern(chatUser.getUserImage().getValue()));
             statusCircle.setFill(chatUser.getStatusImage().getValue());
             setGraphic(hBox);*/
-
         }
     }
 }

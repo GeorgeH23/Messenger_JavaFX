@@ -21,12 +21,15 @@ public class ChatClient {
     private List<UserAvailabilityListener> userAvailabilityListeners = new ArrayList<>();
     private List<PictureChangeListener> pictureChangeListeners = new ArrayList<>();
 
-    private static ChatClient instance = new ChatClient();
+    private static ChatClient instance;
 
     private ChatClient() {
     }
 
     public static ChatClient getInstance() {
+        if (instance == null) {
+            instance = new ChatClient();
+        }
         return instance;
     }
 
@@ -84,7 +87,7 @@ public class ChatClient {
     }
 
     private void startMessageReader() {
-        new Thread(() -> readMessageLoop()).start();
+        new Thread(this::readMessageLoop).start();
     }
 
     private void readMessageLoop() {
@@ -97,7 +100,7 @@ public class ChatClient {
                 }
                 String[] tokens = line.split(" ");
                 //String[] tokens = StringUtils.split(line);
-                if (tokens != null && tokens.length > 0) {
+                if (tokens.length > 0) {
                     String cmd = tokens[0];
                     cmd = cmd.replaceAll("\\p{Punct}", "");
                     if ("online".equalsIgnoreCase(cmd)) {

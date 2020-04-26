@@ -1,11 +1,12 @@
 package com.chatApplication.chatClient.gui.controllers;
 
+import com.chatApplication.chatClient.gui.BaseController;
+import com.chatApplication.chatClient.gui.ChatManager;
+import com.chatApplication.chatClient.gui.ViewFactory;
 import com.chatApplication.chatClient.gui.handlers.AudioHandler;
 import com.chatApplication.chatClient.gui.handlers.ImageHandler;
 import com.chatApplication.chatClient.gui.utility.MessageType;
-import com.chatApplication.chatClient.muc.ChatClient;
 import javafx.application.Platform;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -13,9 +14,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextArea;
-import javafx.scene.image.Image;
 import javafx.scene.input.MouseButton;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -25,19 +24,21 @@ import javafx.scene.shape.Circle;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 import javafx.stage.Stage;
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-public class MessagePaneController {
+public class MessagePaneController extends BaseController {
 
-    private static final ChatClient CHAT_CLIENT = ChatClient.getInstance();
-    private String myself = ChatClient.getInstance().getThisClientLogin();
+    private ViewFactory viewFactory;
+    private ChatManager chatManager;
+    private String myself;
     private double initialX;
     private double initialY;
     private AudioHandler audio;
     private ImagePattern userImage;
 
+    @FXML
+    private Button btnMinimize;
     @FXML
     private Button btnClose;
     @FXML
@@ -49,61 +50,53 @@ public class MessagePaneController {
     @FXML
     private AnchorPane titleBar;
     @FXML
-    private Button btnSend;
-    @FXML
     private ScrollPane scrollPane;
     @FXML
     private VBox chatBox;
-    @FXML
-    private Button btnMinimize;
+
+    public MessagePaneController() {
+        super();
+        this.viewFactory = super.viewFactory;
+        this.chatManager = super.chatManager;
+        this.myself = chatManager.getLoggedUserLogin();
+    }
+
     @FXML
     private void initialize() {
+        addDraggableNode(titleBar);
 
         audio = AudioHandler.getInstance();
         audio.load("/utils/sounds/sent.wav", "sent");
-
         // Automatically scroll down to the last message in the conversation.
-        chatBox.heightProperty().addListener(
-                (observable, oldValue, newValue) -> {
+        chatBox.heightProperty().addListener((observable, oldValue, newValue) -> {
                     chatBox.layout();
-                    scrollPane.setVvalue( 1.0d );
+                    scrollPane.setVvalue(1.0d);
                 }
         );
     }
 
     @FXML
+    public final void sendAction() {
+        String sendTo = userID.getText();
+        String message = txtMsg.getText().trim();
+
+        if (chatManager.sendMessage(sendTo,message)) {
+            createMessage(message, MessageType.SENT);
+            audio.play("sent", 0);
+            txtMsg.clear();
+        }
+    }
+
+    @FXML
     public final void closeAction() {
-        //Runtime.getRuntime().exit(0);
-        ((Stage)btnClose.getScene().getWindow()).hide();
+        Stage stage = (Stage) btnClose.getScene().getWindow();
+        viewFactory.hideStage(stage);
     }
 
     @FXML
     public final void minimizeAction() {
         Stage stage = (Stage) btnMinimize.getScene().getWindow();
-        stage.setIconified(true);
-    }
-
-    @FXML
-    public final void sendAction(){
-
-        String sendTo = userID.getText();
-        String message = txtMsg.getText().trim();
-
-        String processedMsg = message.replaceAll("\n", "##NL##");
-
-        // Send the message only if it contains at leas one ASCII character.
-        if (processedMsg.matches(".*\\w.*")) {
-            try {
-                CHAT_CLIENT.msg(sendTo, processedMsg);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            createMessage(message, MessageType.SENT);
-            audio.play("sent", 0);
-
-            txtMsg.clear();
-        }
+        viewFactory.minimizeStage(stage);
     }
 
     private void createMessage(String message, MessageType messageType) {
@@ -165,25 +158,16 @@ public class MessagePaneController {
 
     // This method is used for moving the MessagePanes on the screen.
     private void addDraggableNode(final Node node) {
-
-        node.setOnMousePressed(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent me) {
-
-                if (me.getButton() != MouseButton.MIDDLE) {
-                    initialX = me.getSceneX();
-                    initialY = me.getSceneY();
-                }
+        node.setOnMousePressed(me -> {
+            if (me.getButton() != MouseButton.MIDDLE) {
+                initialX = me.getSceneX();
+                initialY = me.getSceneY();
             }
         });
-
-        node.setOnMouseDragged(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent me) {
-                if (me.getButton() != MouseButton.MIDDLE) {
-                    node.getScene().getWindow().setX(me.getScreenX() - initialX);
-                    node.getScene().getWindow().setY(me.getScreenY() - initialY);
-                }
+        node.setOnMouseDragged(me -> {
+            if (me.getButton() != MouseButton.MIDDLE) {
+                node.getScene().getWindow().setX(me.getScreenX() - initialX);
+                node.getScene().getWindow().setY(me.getScreenY() - initialY);
             }
         });
     }
@@ -193,27 +177,18 @@ public class MessagePaneController {
     }
 
     public final void onMessage(String fromLogin, String msgBody) {
-
         if (fromLogin.replaceAll("\\p{Punct}", "").equals(userID.getText())) {
-
             createMessage(msgBody, MessageType.RECEIVED);
         }
     }
 
-    public final void inititializePane(String paneTitle){
-        addDraggableNode(titleBar);
-        userID.setText(paneTitle.replaceAll("\\p{Punct}", ""));
-        txtMsg.deselect();
-        btnSend.requestFocus();
-    }
-
-    public final void resize(){
+    public final void resize() {
         txtMsg.setPrefSize( btnClose.getScene().getWindow().getWidth() - 220, 50);
         titleBar.setPrefWidth(rootPane.getScene().getWindow().getWidth()- 15);
 
     }
 
-    public final void setUserID(String userId){
+    public final void setUserID(String userId) {
         userID.setText(userId);
     }
 

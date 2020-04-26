@@ -216,6 +216,7 @@ public class DataSource {
         try {
             InputStream input;
             if (path.equals("/utils/images/users/user.png")) {
+                getClass().getResource("/utils/images/users/user.png");
                 input = getClass().getResourceAsStream(path);
             } else {
                 File file = new File(path);

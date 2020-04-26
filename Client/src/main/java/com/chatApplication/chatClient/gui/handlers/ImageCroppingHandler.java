@@ -2,23 +2,17 @@ package com.chatApplication.chatClient.gui.handlers;
 
 import com.chatApplication.chatClient.gui.controllers.ImageCroppingHandlerController;
 import javafx.event.EventHandler;
-import javafx.fxml.FXMLLoader;
 import javafx.geometry.Bounds;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Group;
-import javafx.scene.Scene;
 import javafx.scene.SnapshotParameters;
 import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.StrokeLineCap;
-import javafx.stage.Stage;
 import javafx.embed.swing.SwingFXUtils;
-import javafx.stage.StageStyle;
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -28,46 +22,27 @@ import java.net.MalformedURLException;
 
 public class ImageCroppingHandler {
 
-    private RubberBandSelection rubberBandSelection;
-    private String croppedImagePath;
-    private Stage primaryStage;
-    private BorderPane root;
-    private Group imageLayer;
-    private ImageView imageView;
+    private static ImageCroppingHandler instance;
 
-    private static ImageCroppingHandler instance = new ImageCroppingHandler();
+    private RubberBandSelection rubberBandSelection;
+    private ImageCroppingHandlerController imageCroppingHandlerController;
+    private String croppedImagePath;
 
     private ImageCroppingHandler() {
     }
 
     public static ImageCroppingHandler getInstance() {
+        if (instance == null) {
+            instance = new ImageCroppingHandler();
+        }
         return instance;
     }
 
-    public void pictureCropper(Stage stage, String filePath) {
-
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/imageCroppingHandlerView.fxml"));
-        try {
-            loader.load();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        ImageCroppingHandlerController controller = loader.getController();
-        root = controller.getRoot();
-        imageLayer = controller.getImageLayer();
-        imageView = controller.getImageView();
-
-        start(stage, filePath);
+    public void pictureCropper(String filePath) {
+        start(filePath);
     }
 
-    public final String getCroppedImagePath() {
-        return this.croppedImagePath;
-    }
-
-    private void start(Stage stage, String filePath) {
-
-        this.primaryStage = stage;
-        this.primaryStage.setTitle("Image Cropping");
+    private void start(String filePath) {
         // load the image
         File file = new File(filePath);
         Image image = null;
@@ -77,15 +52,9 @@ public class ImageCroppingHandler {
             e.printStackTrace();
         }
         // the container for the image as a javafx node
-        imageView.setImage(image);
-        imageView.fitWidthProperty().bind(root.widthProperty().subtract(60));
-        imageView.fitHeightProperty().bind(root.heightProperty().subtract(60));
+        imageCroppingHandlerController.getImageView().setImage(image);
         // rubberband selection
-        rubberBandSelection = new RubberBandSelection(imageLayer);
-
-        this.primaryStage.setScene(new Scene(root, 800, 800));
-        this.primaryStage.initStyle(StageStyle.TRANSPARENT);
-        this.primaryStage.show();
+        rubberBandSelection = new RubberBandSelection(imageCroppingHandlerController.getImageLayer());
     }
 
     public String cropAction(){
@@ -103,7 +72,6 @@ public class ImageCroppingHandler {
     }
 
     private void crop(Bounds bounds) {
-
         File file = null;
         try {
             file = File.createTempFile("croppedPicture", ".jpg");
@@ -122,10 +90,9 @@ public class ImageCroppingHandler {
         parameters.setViewport(new Rectangle2D( bounds.getMinX(), bounds.getMinY(), width, height));
 
         WritableImage wi = new WritableImage( width, height);
-        imageView.snapshot(parameters, wi);
+        imageCroppingHandlerController.getImageView().snapshot(parameters, wi);
 
         // save image (without alpha)
-        // --------------------------------
         BufferedImage bufImageARGB = SwingFXUtils.fromFXImage(wi, null);
         BufferedImage bufImageRGB = new BufferedImage(bufImageARGB.getWidth(), bufImageARGB.getHeight(), BufferedImage.OPAQUE);
 
@@ -140,15 +107,10 @@ public class ImageCroppingHandler {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
         graphics.dispose();
-        primaryStage.close();
-
     }
 
-    /**
-     * Drag circle with mouse cursor in order to get selection bounds
-     */
+    //Drag circle with mouse cursor in order to get selection bounds
     private static class RubberBandSelection {
 
         final DragContext dragContext = new DragContext();
@@ -178,7 +140,7 @@ public class ImageCroppingHandler {
             if( event.isSecondaryButtonDown()) {
                 return;
             }
-            // remove old rect
+            // remove old circle
             circle.setCenterX(event.getX());
             circle.setCenterY(event.getY());
             circle.setRadius(0);
@@ -216,14 +178,12 @@ public class ImageCroppingHandler {
         EventHandler<MouseEvent> onMouseReleasedEventHandler = event -> {
             if( event.isSecondaryButtonDown())
                 return;
-            // remove rectangle
-            // note: we want to keep the ruuberband selection for the cropping => code is just commented out
+            // remove circle
+            // note: we want to keep the rubberBand selection for the cropping => code is just commented out
                 /*
-                rect.setX(0);
-                rect.setY(0);
-                rect.setWidth(0);
-                rect.setHeight(0);
-
+                circle.setCenterX(0);
+                circle.setCenterY(0);
+                circle.setRadius(0);
                 group.getChildren().remove(circle);
                 */
         };
@@ -234,7 +194,11 @@ public class ImageCroppingHandler {
         }
     }
 
-    public final Stage getPrimaryStage() {
-        return primaryStage;
+    public final String getCroppedImagePath() {
+        return this.croppedImagePath;
+    }
+
+    public void setImageCroppingHandlerController(ImageCroppingHandlerController controller) {
+        this.imageCroppingHandlerController = controller;
     }
 }

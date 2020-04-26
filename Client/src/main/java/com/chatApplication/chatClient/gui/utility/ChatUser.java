@@ -26,23 +26,7 @@ public class ChatUser {
     }
 
     public final void setStatusImage(String newStatus) {
-        switch (newStatus) {
-            case "available" :
-                this.statusImage.setValue(ImageHandler.getInstance().getAvailableStatusImage());
-                break;
-            case "busy" :
-                this.statusImage.setValue(ImageHandler.getInstance().getBusyStatusImage());
-                break;
-            case "away" :
-                this.statusImage.setValue(ImageHandler.getInstance().getAwayStatusImage());
-                break;
-            case "dnd" :
-                this.statusImage.setValue(ImageHandler.getInstance().getDndStatusImage());
-                break;
-            default:
-                this.statusImage.setValue(ImageHandler.getInstance().getUnknownStatusImage());
-                break;
-        }
+        this.statusImage.setValue(ImageHandler.getInstance().getStatusImage(newStatus));
     }
 
     public final void setUserImage(String path) {
