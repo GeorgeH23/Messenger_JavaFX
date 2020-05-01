@@ -1,11 +1,10 @@
-package com.chatApplication.chatClient.gui.controllers;
+package com.chatApplication.chatClient.gui.controller;
 
-import com.chatApplication.chatClient.gui.BaseController;
 import com.chatApplication.chatClient.gui.ChatManager;
-import com.chatApplication.chatClient.gui.ViewFactory;
-import com.chatApplication.chatClient.gui.handlers.AudioHandler;
-import com.chatApplication.chatClient.gui.handlers.ImageHandler;
-import com.chatApplication.chatClient.gui.utility.MessageType;
+import com.chatApplication.chatClient.gui.view.ViewFactory;
+import com.chatApplication.chatClient.gui.model.handlers.AudioHandler;
+import com.chatApplication.chatClient.gui.model.handlers.ImageHandler;
+import com.chatApplication.chatClient.gui.model.utility.MessageType;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
@@ -87,18 +86,6 @@ public class MessagePaneController extends BaseController {
         }
     }
 
-    @FXML
-    public final void closeAction() {
-        Stage stage = (Stage) btnClose.getScene().getWindow();
-        viewFactory.hideStage(stage);
-    }
-
-    @FXML
-    public final void minimizeAction() {
-        Stage stage = (Stage) btnMinimize.getScene().getWindow();
-        viewFactory.minimizeStage(stage);
-    }
-
     private void createMessage(String message, MessageType messageType) {
         Text text = new Text(message);
         text.setFill(Color.WHITE);
@@ -156,7 +143,21 @@ public class MessagePaneController extends BaseController {
         Platform.runLater(() -> chatBox.getChildren().addAll(hbox));
     }
 
-    // This method is used for moving the MessagePanes on the screen.
+    // This method is responsible for closing the application when the "Exit" button is pressed
+    @FXML
+    public final void closeAction() {
+        Stage stage = (Stage) btnClose.getScene().getWindow();
+        viewFactory.hideStage(stage);
+    }
+
+    // This method is responsible for minimizing the application window when the "Minimize" button is pressed
+    @FXML
+    public final void minimizeAction() {
+        Stage stage = (Stage) btnMinimize.getScene().getWindow();
+        viewFactory.minimizeStage(stage);
+    }
+
+    // This method is a custom implementation used for enabling the movement of the stages around the screen.
     private void addDraggableNode(final Node node) {
         node.setOnMousePressed(me -> {
             if (me.getButton() != MouseButton.MIDDLE) {

@@ -1,6 +1,5 @@
-package com.chatApplication.chatClient.gui.controllers;
+package com.chatApplication.chatClient.gui.controller;
 
-import com.chatApplication.chatClient.gui.ViewFactory;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.layout.HBox;

@@ -1,9 +1,8 @@
-package com.chatApplication.chatClient.gui.controllers;
+package com.chatApplication.chatClient.gui.controller;
 
-import com.chatApplication.chatClient.gui.BaseController;
 import com.chatApplication.chatClient.gui.ChatManager;
-import com.chatApplication.chatClient.gui.ViewFactory;
-import com.chatApplication.chatClient.gui.handlers.ImageCroppingHandler;
+import com.chatApplication.chatClient.gui.view.ViewFactory;
+import com.chatApplication.chatClient.gui.model.handlers.ImageCroppingHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Group;
@@ -74,7 +73,8 @@ public class ImageCroppingHandlerController extends BaseController implements In
         Stage stage = (Stage) btnMinimize.getScene().getWindow();
         viewFactory.minimizeStage(stage);
     }
-    // This method is a custom implementation used for enabling the movement of the "MessagePanes" around the screen.
+
+    // This method is a custom implementation used for enabling the movement of the stages around the screen.
     private void addDraggableNode(final Node node) {
         node.setOnMousePressed(event -> {
             if (event.getButton() != MouseButton.MIDDLE) {

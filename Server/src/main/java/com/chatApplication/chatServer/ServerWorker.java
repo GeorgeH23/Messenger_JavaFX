@@ -24,7 +24,7 @@ public class ServerWorker extends Thread {
     private static int loginCount = 0;
     private boolean isLoggedIn;
     private Map<String, String> userStatus;
-    private static final DataSource DATA_SOURCE = DataSource.getInstance();
+    private final DataSource dataSource;
 
     public ServerWorker(Server server, Socket clientSocket) {
         this.server = server;
@@ -33,6 +33,7 @@ public class ServerWorker extends Thread {
         this.isLoggedIn = false;
         this.topicSet = new HashSet<>();
         this.userStatus = server.getWorkerStatusList();
+        this.dataSource = new DataSource();
     }
 
     @Override
@@ -234,7 +235,7 @@ public class ServerWorker extends Thread {
 
             String msg;
             String dbMessage = checkLoginDetails(login, password);
-            DATA_SOURCE.close();
+            dataSource.close();
 
             switch (dbMessage) {
                 case "Credentials OK":
@@ -317,8 +318,8 @@ public class ServerWorker extends Thread {
 
     private String checkLoginDetails(String username, String password) {
         try {
-            if (DATA_SOURCE.open()) {
-                Map<String, String> dbResults = DATA_SOURCE.checkLogin(username);
+            if (dataSource.open()) {
+                Map<String, String> dbResults = dataSource.checkLogin(username);
                 String hashedPassword = "";
                 if (dbResults != null) {
                     hashedPassword = PasswordHasher.getInstance().generateHash(password);

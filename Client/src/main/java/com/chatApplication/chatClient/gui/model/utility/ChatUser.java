@@ -1,6 +1,6 @@
-package com.chatApplication.chatClient.gui.utility;
+package com.chatApplication.chatClient.gui.model.utility;
 
-import com.chatApplication.chatClient.gui.handlers.ImageHandler;
+import com.chatApplication.chatClient.gui.model.handlers.ImageHandler;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.image.Image;
@@ -17,8 +17,8 @@ public class ChatUser {
         this.login = login;
         this.statusImage = new SimpleObjectProperty<>();
         this.userImage = new SimpleObjectProperty<>();
-        setUserImage(picturePath);
         setStatusImage(userStatus);
+        this.userImage.setValue(ImageHandler.getInstance().getUnknownUserImage());
     }
 
     public final String getLogin() {
@@ -31,7 +31,12 @@ public class ChatUser {
 
     public final void setUserImage(String path) {
         try {
-            Image image = new Image(new File(path).toURI().toString(), true);
+            Image image;
+            if (path != null) {
+                image = new Image(new File(path).toURI().toString(), true);
+            } else {
+                image = new Image(getClass().getResource("/utils/images/users/user.png").toURI().toURL().toString());
+            }
             image.progressProperty().addListener((obs, ov, nv) -> {
                 if (nv.equals(1.0)) {
                     this.userImage.setValue(new ImagePattern(image));

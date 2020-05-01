@@ -13,7 +13,7 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<AnchorPane fx:id="root" prefHeight="357.0" prefWidth="421.0" stylesheets="@../utils/css/loginWindowStyling.css" xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.chatApplication.chatClient.gui.controllers.LoginWindowController">
+<AnchorPane fx:id="root" prefHeight="357.0" prefWidth="421.0" stylesheets="@../utils/css/loginWindowStyling.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.chatApplication.chatClient.gui.controller.LoginWindowController">
    <children>
       <AnchorPane fx:id="svgPane" layoutX="-1.0" layoutY="32.0" prefHeight="325.0" prefWidth="421.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="-1.0" AnchorPane.rightAnchor="1.0" AnchorPane.topAnchor="32.0">
          <children>
@@ -51,6 +51,7 @@
             </Text>
             <Label fx:id="warningUsername" alignment="CENTER" layoutX="126.0" layoutY="67.0" prefHeight="30.0" prefWidth="152.0" style="-fx-background-color: #000000; -fx-background-radius: 8;" text="Username doesn't exist" textFill="WHITE" visible="false" />
             <Label fx:id="warningPassword" alignment="CENTER" layoutX="126.0" layoutY="119.0" prefHeight="30.0" prefWidth="124.0" style="-fx-background-color: #000000; -fx-background-radius: 8;" text="Incorrect password" textFill="WHITE" visible="false" />
+            <Label fx:id="errorLabel" alignment="CENTER" layoutX="78.0" layoutY="296.0" prefHeight="21.0" prefWidth="266.0" />
          </children>
       </AnchorPane>
       <AnchorPane fx:id="titleBar" prefHeight="30.0" prefWidth="421.0">

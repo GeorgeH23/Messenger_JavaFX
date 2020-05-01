@@ -1,6 +1,6 @@
-package com.chatApplication.chatClient.gui.handlers;
+package com.chatApplication.chatClient.gui.model.handlers;
 
-import com.chatApplication.chatClient.gui.controllers.ImageCroppingHandlerController;
+import com.chatApplication.chatClient.gui.controller.ImageCroppingHandlerController;
 import javafx.event.EventHandler;
 import javafx.geometry.Bounds;
 import javafx.geometry.Rectangle2D;
@@ -38,11 +38,7 @@ public class ImageCroppingHandler {
         return instance;
     }
 
-    public void pictureCropper(String filePath) {
-        start(filePath);
-    }
-
-    private void start(String filePath) {
+    public void startPictureCropper(String filePath) {
         // load the image
         File file = new File(filePath);
         Image image = null;

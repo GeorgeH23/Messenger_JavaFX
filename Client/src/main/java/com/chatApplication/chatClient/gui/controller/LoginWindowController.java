@@ -1,9 +1,9 @@
-package com.chatApplication.chatClient.gui.controllers;
+package com.chatApplication.chatClient.gui.controller;
 
-import com.chatApplication.chatClient.gui.BaseController;
 import com.chatApplication.chatClient.gui.ChatManager;
-import com.chatApplication.chatClient.gui.ViewFactory;
-import com.chatApplication.chatClient.gui.handlers.ImageHandler;
+import com.chatApplication.chatClient.gui.view.ViewFactory;
+import com.chatApplication.chatClient.gui.model.handlers.ImageHandler;
+import com.chatApplication.chatClient.gui.controller.services.LoginService;
 import javafx.animation.PauseTransition;
 import javafx.application.Platform;
 import javafx.event.Event;
@@ -18,6 +18,7 @@ import javafx.scene.input.ContextMenuEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import java.net.URL;
@@ -42,6 +43,12 @@ public class LoginWindowController extends BaseController implements Initializab
     private Label warningUsername;
     @FXML
     private Label warningPassword;
+    @FXML
+    private Button btnLogin;
+    @FXML
+    private Text createNewAccount;
+    @FXML
+    private Label errorLabel;
 
     public LoginWindowController() {
         super();
@@ -67,25 +74,46 @@ public class LoginWindowController extends BaseController implements Initializab
             setStyle(txtPassword, 5.0);
         }
         if (!txtUsername.getText().equals("") && !txtPassword.getText().equals("")) {
-            String loginAttemptResult = chatManager.attemptToLogin(txtUsername.getText(),txtPassword.getText());
-            switch (loginAttemptResult) {
-                case "Login OK":
-                    txtPassword.clear();
-                    viewFactory.showMainWindow();
-                    MainWindowController controller = (MainWindowController) viewFactory.getController("mainWindowView");
-                    controller.setLoggedClientName(chatManager.getLoggedUserLogin());
-                    controller.setLoggedUserStatusLight(ImageHandler.getInstance().getStatusImage(chatManager.getLoggedUserStatus()));
-                    controller.setLoggedClientStatus(chatManager.getLoggedUserStatus());
-                    controller.setLoggedClientPicture();
-                    chatManager.setController(controller);
-                    break;
-                case "No such username":
-                    showWarning(warningUsername, 3.0);
-                    break;
-                case "Incorrect Password":
-                    showWarning(warningPassword, 3.0);
-                    break;
-            }
+            errorLabel.setText("Signing in...");
+            btnLogin.setDisable(true);
+            createNewAccount.setDisable(true);
+            Stage mainStage = viewFactory.showMainWindow();
+            viewFactory.hideStage(mainStage);
+            MainWindowController controller = (MainWindowController) viewFactory.getController("mainWindowView");
+            chatManager.setController(controller);
+
+            LoginService loginService = chatManager.attemptToLogin(txtUsername.getText(), txtPassword.getText());
+            loginService.setOnSucceeded(event -> {
+                ChatLoginResult loginAttemptResult = loginService.getValue();
+                switch (loginAttemptResult) {
+                    case SUCCESS:
+                        errorLabel.setText("");
+                        txtPassword.clear();
+                        controller.setLoggedClientName(chatManager.getLoggedUserLogin());
+                        controller.setLoggedUserStatusLight(ImageHandler.getInstance().getStatusImage(chatManager.getLoggedUserStatus()));
+                        controller.setLoggedClientStatus(chatManager.getLoggedUserStatus());
+                        controller.setLoggedClientPicture();
+                        Stage loginStage = (Stage) btnLogin.getScene().getWindow();
+                        viewFactory.hideStage(loginStage);
+                        viewFactory.showStage(mainStage);
+                        break;
+                    case FAILED_BY_USERNAME:
+                        showWarning(warningUsername, 3.0);
+                        break;
+                    case FAILED_BY_PASSWORD:
+                        showWarning(warningPassword, 3.0);
+                        break;
+                    case FAILED_BY_NETWORK:
+                        errorLabel.setText("Couldn't connect to server!");
+                        break;
+                    case FAILED_BY_UNEXPECTED_ERROR:
+                        errorLabel.setText("Unexpected error!");
+                        break;
+                }
+                btnLogin.setDisable(false);
+                createNewAccount.setDisable(false);
+                errorLabel.setText("");
+            });
         }
     }
 
@@ -102,7 +130,6 @@ public class LoginWindowController extends BaseController implements Initializab
     // This method is responsible for closing the application when the "Exit" button is pressed
     @FXML
     public final void closeAction() {
-        chatManager.closeDatabaseConnection();
         Platform.exit();
         System.exit(0);
     }
@@ -114,7 +141,7 @@ public class LoginWindowController extends BaseController implements Initializab
         viewFactory.minimizeStage(stage);
     }
 
-    // This method is a custom implementation used for enabling the movement of the "MessagePanes" around the screen.
+    // This method is a custom implementation used for enabling the movement of the stages around the screen.
     private void addDraggableNode(final Node node) {
         node.setOnMousePressed(event -> {
             if (event.getButton() != MouseButton.MIDDLE) {

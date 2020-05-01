@@ -43,27 +43,17 @@ public class DataSource {
 
     private PreparedStatement queryUsersCheckExists;
     private PreparedStatement queryLogin;
-    private PreparedStatement inserUser;
+    private PreparedStatement insertUser;
     private PreparedStatement queryPicture;
     private PreparedStatement updatePicture;
-
     private Connection connection;
-
-    private static DataSource instance = new DataSource();
-
-    private DataSource() {
-    }
-
-    public static DataSource getInstance() {
-        return instance;
-    }
 
     public boolean open() {
         try {
             connection = DriverManager.getConnection(CONNECTION_STRING);
             queryUsersCheckExists = connection.prepareStatement(QUERY_USERS_CHECK_EXISTS);
             queryLogin = connection.prepareStatement(QUERY_LOGIN);
-            inserUser = connection.prepareStatement(INSERT_USER);
+            insertUser = connection.prepareStatement(INSERT_USER);
             queryPicture = connection.prepareStatement(QUERY_PICTURE);
             updatePicture = connection.prepareStatement(UPDATE_PICTURE);
 
@@ -84,8 +74,8 @@ public class DataSource {
             if (queryLogin != null) {
                 queryLogin.close();
             }
-            if (inserUser != null) {
-                inserUser.close();
+            if (insertUser != null) {
+                insertUser.close();
             }
             if (queryPicture != null) {
                 queryPicture.close();
@@ -148,17 +138,17 @@ public class DataSource {
     public String insertNewUser(NewUser user) {
         if (!checkUsernameExists(user.getUsername())) {
             try {
-                inserUser.setString(1, user.getUsername());
-                inserUser.setString(2, user.getPassword());
-                inserUser.setString(3, user.getPhone());
+                insertUser.setString(1, user.getUsername());
+                insertUser.setString(2, user.getPassword());
+                insertUser.setString(3, user.getPhone());
                 if (!user.getPicture().equals("")) {
-                    inserUser.setBytes(4, readFile(user.getPicture()));
+                    insertUser.setBytes(4, readFile(user.getPicture()));
                 } else {
-                    inserUser.setBytes(4, readFile("/utils/images/users/user.png"));
+                    insertUser.setBytes(4, readFile("/utils/images/users/user.png"));
                 }
 
                 System.out.println("\nStoring user in database: " + user.toString());
-                inserUser.executeUpdate();
+                insertUser.executeUpdate();
                 System.out.println("\nCompleted successfully!");
 
                 return "New Account Created";
@@ -176,7 +166,6 @@ public class DataSource {
             String path = System.getProperty("user.home") + File.separator + "Documents" + File.separator + "MessengerApplication" + File.separator + username + ".jpg";
             queryPicture.setString(1, username);
             ResultSet results = queryPicture.executeQuery();
-
             File file = new File(path);
             FileOutputStream fos = new FileOutputStream(file);
 
@@ -236,8 +225,6 @@ public class DataSource {
     }
 
     public static void main(String[] args) throws IOException, SQLException, NoSuchAlgorithmException {
-        DataSource.getInstance().open();
-            //DataSource.getInstance().updateUserPicture("frank", "C:\\Users\\gharpa\\Desktop\\PICS\\bub.png");
-        DataSource.getInstance().close();
+
     }
 }

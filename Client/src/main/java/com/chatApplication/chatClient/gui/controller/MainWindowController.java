@@ -1,14 +1,14 @@
-package com.chatApplication.chatClient.gui.controllers;
+package com.chatApplication.chatClient.gui.controller;
 
-import com.chatApplication.chatClient.gui.BaseController;
 import com.chatApplication.chatClient.gui.ChatManager;
-import com.chatApplication.chatClient.gui.ViewFactory;
-import com.chatApplication.chatClient.gui.handlers.AudioHandler;
-import com.chatApplication.chatClient.gui.handlers.ImageCroppingHandler;
-import com.chatApplication.chatClient.gui.handlers.ImageHandler;
-import com.chatApplication.chatClient.gui.utility.ChatUser;
-import com.chatApplication.chatClient.gui.utility.FileChooserGenerator;
-import com.chatApplication.chatClient.gui.utility.UserListViewCell;
+import com.chatApplication.chatClient.gui.view.ViewFactory;
+import com.chatApplication.chatClient.gui.model.handlers.AudioHandler;
+import com.chatApplication.chatClient.gui.model.handlers.ImageCroppingHandler;
+import com.chatApplication.chatClient.gui.model.handlers.ImageHandler;
+import com.chatApplication.chatClient.gui.controller.services.PictureChangeService;
+import com.chatApplication.chatClient.gui.model.utility.ChatUser;
+import com.chatApplication.chatClient.gui.model.utility.FileChooserGenerator;
+import com.chatApplication.chatClient.gui.model.utility.UserListViewCell;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
@@ -137,21 +137,6 @@ public class MainWindowController extends BaseController {
     }
 
     @FXML
-    private void minimizeAction() {
-        Stage stage = (Stage) titleBar.getScene().getWindow();
-        viewFactory.minimizeStage(stage);
-    }
-
-    @FXML
-    private void closeAction() {
-        showNotification("", "goodbye");
-        Stage stage = (Stage) titleBar.getScene().getWindow();
-        viewFactory.closeStage(stage);
-        chatManager.removeListeners();
-        chatManager.logOffClient();
-    }
-
-    @FXML
     private void changeStatusToAvailable() {
         chatManager.changeLoggedUserStatus("available");
         statusMenu.setText("Available");
@@ -185,34 +170,53 @@ public class MainWindowController extends BaseController {
 
         if (newImage != null) {
             Stage stage = viewFactory.showImageCroppingWindow();
-            imageCroppingHandler.pictureCropper(newImage.getAbsolutePath());
+            imageCroppingHandler.startPictureCropper(newImage.getAbsolutePath());
             stage.setOnHiding(windowEvent -> {
                 this.path = imageCroppingHandler.getCroppedImagePath();
                 System.out.println(this.path);
                 if (this.path != null) {
-                    chatManager.pictureChange(loggedClientName.getText(), path);
-                    try {
-                        File file = new File(path);
-                        file.deleteOnExit();
+                    PictureChangeService service = chatManager.pictureChange(loggedClientName.getText(), path);
+                    service.setOnSucceeded(event -> {
+                        try {
+                            File file = new File(path);
+                            file.deleteOnExit();
 
-                        Image image = new Image(file.toURI().toURL().toString(), true);
-                        image.progressProperty().addListener((obs, ov, nv) -> {
-                            if (nv.equals(1.0)) {
-                                ImageHandler.getInstance().changeCurrentLoggedUserImage(image);
-                                loggedClientPicture.setFill(ImageHandler.getInstance().getCurrentLoggedUserImage());
-                            }
-                        });
-                    } catch (MalformedURLException e) {
-                        setLoggedClientPicture();
-                        e.printStackTrace();
-                    }
+                            Image image = new Image(file.toURI().toURL().toString(), true);
+                            image.progressProperty().addListener((obs, ov, nv) -> {
+                                if (nv.equals(1.0)) {
+                                    ImageHandler.getInstance().changeCurrentLoggedUserImage(image);
+                                    loggedClientPicture.setFill(ImageHandler.getInstance().getCurrentLoggedUserImage());
+                                }
+                            });
+                        } catch (MalformedURLException e) {
+                            setLoggedClientPicture();
+                            e.printStackTrace();
+                        }
+                    });
                 }
             });
-
         }
     }
 
-    // This function is used for moving the MessagePanes on the screen.
+    // This method is responsible for closing the application when the "Exit" button is pressed
+    @FXML
+    private void closeAction() {
+        showNotification("", "goodbye");
+        Stage stage = (Stage) titleBar.getScene().getWindow();
+        viewFactory.closeStage(stage);
+        chatManager.getLoggedClientsList().removeAll();
+        chatManager.removeListeners();
+        chatManager.logOffClient();
+    }
+
+    // This method is responsible for minimizing the application window when the "Minimize" button is pressed
+    @FXML
+    private void minimizeAction() {
+        Stage stage = (Stage) titleBar.getScene().getWindow();
+        viewFactory.minimizeStage(stage);
+    }
+
+    // This method is a custom implementation used for enabling the movement of the stages around the screen.
     private void addDraggableNode(final Node node) {
         node.setOnMousePressed(event -> {
             if (event.getButton() != MouseButton.MIDDLE) {

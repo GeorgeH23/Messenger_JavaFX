@@ -1,7 +1,8 @@
 package com.chatApplication.chatClient.gui;
 
-import com.chatApplication.chatClient.gui.handlers.AudioHandler;
-import com.chatApplication.chatClient.gui.handlers.ImageHandler;
+import com.chatApplication.chatClient.gui.model.handlers.AudioHandler;
+import com.chatApplication.chatClient.gui.model.handlers.ImageHandler;
+import com.chatApplication.chatClient.gui.view.ViewFactory;
 import javafx.application.Application;
 import javafx.stage.Stage;
 import java.io.File;
@@ -25,7 +26,6 @@ public class Main extends Application {
             directory.mkdir();
         }
 
-        ChatManager.getInstance().openDatabaseConnection();
         ImageHandler.getInstance().loadStatusImages();
         ViewFactory.getInstance().showLoginWindow();
 

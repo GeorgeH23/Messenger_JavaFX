@@ -1,10 +1,10 @@
-package com.chatApplication.chatClient.gui.controllers;
+package com.chatApplication.chatClient.gui.controller;
 
-import com.chatApplication.chatClient.gui.BaseController;
 import com.chatApplication.chatClient.gui.ChatManager;
-import com.chatApplication.chatClient.gui.ViewFactory;
-import com.chatApplication.chatClient.gui.utility.FileChooserGenerator;
-import com.chatApplication.chatClient.gui.handlers.ImageCroppingHandler;
+import com.chatApplication.chatClient.gui.view.ViewFactory;
+import com.chatApplication.chatClient.gui.controller.services.CreateAccountService;
+import com.chatApplication.chatClient.gui.model.utility.FileChooserGenerator;
+import com.chatApplication.chatClient.gui.model.handlers.ImageCroppingHandler;
 import javafx.animation.PauseTransition;
 import javafx.event.Event;
 import javafx.fxml.FXML;
@@ -30,9 +30,9 @@ public class CreateAccountController extends BaseController implements Initializ
     private ViewFactory viewFactory;
     private ChatManager chatManager;
     private ImageCroppingHandler imageCroppingHandler;
+    private List<String> currentShowingWarnings;
     private double initialX;
     private double initialY;
-    private List<String> currentShowingWarnings;
 
     @FXML
     private AnchorPane titleBar;
@@ -56,6 +56,10 @@ public class CreateAccountController extends BaseController implements Initializ
     private Label warningUsername;
     @FXML
     private Label successNote;
+    @FXML
+    private Button btnCreate;
+    @FXML
+    private Button btnBrowse;
 
     public CreateAccountController() {
         super();
@@ -125,14 +129,26 @@ public class CreateAccountController extends BaseController implements Initializ
             }
             return;
         }
-        String response = chatManager.createNewAccount(txtUsername.getText(), txtPassword.getText(), txtContact.getText(), txtPath.getText());
-        if (response.equalsIgnoreCase("Success")) {
-            setupSuccessLabel("Account Successfully Created!","-fx-text-fill: #02d30d; -fx-background-color: transparent;");
-        } else if (response.equalsIgnoreCase("Username Exists")) {
-            setupSuccessLabel("Username Exists!","-fx-text-fill: black;");
-        } else if (response.equalsIgnoreCase("Error")) {
-            setupSuccessLabel("Error!","-fx-text-fill: red; -fx-background-color: white;");
-        }
+
+        btnBrowse.setDisable(true);
+        btnCreate.setDisable(true);
+        CreateAccountService service = chatManager.createNewAccount(txtUsername.getText(), txtPassword.getText(), txtContact.getText(), txtPath.getText());
+        service.setOnSucceeded(event -> {
+            btnBrowse.setDisable(false);
+            btnCreate.setDisable(false);
+            CreateAccountResult response = service.getValue();
+            switch (response) {
+                case SUCCESS:
+                    setupSuccessLabel("Account Successfully Created!","-fx-text-fill: #02d30d; -fx-background-color: transparent;");
+                    break;
+                case FAILED_BY_USERNAME:
+                    setupSuccessLabel("Username Exists!","-fx-text-fill: black;");
+                    break;
+                case FAILED_BY_UNEXPECTED_ERROR:
+                    setupSuccessLabel("Error!","-fx-text-fill: red; -fx-background-color: white;");
+                    break;
+            }
+        });
     }
 
     @FXML
@@ -140,7 +156,7 @@ public class CreateAccountController extends BaseController implements Initializ
         File file = FileChooserGenerator.showOpenFile(txtPath.getScene().getWindow());
         if(file != null) {
             Stage stage = viewFactory.showImageCroppingWindow();
-            imageCroppingHandler.pictureCropper(file.getAbsolutePath());
+            imageCroppingHandler.startPictureCropper(file.getAbsolutePath());
 
             stage.setOnHiding(windowEvent -> {
                 String path = imageCroppingHandler.getCroppedImagePath();
@@ -150,19 +166,21 @@ public class CreateAccountController extends BaseController implements Initializ
         }
     }
 
+    // This method is responsible for closing the application when the "Exit" button is pressed
     @FXML
     public final void closeAction() {
         Stage stage = (Stage)txtPassword.getScene().getWindow();
         viewFactory.closeStage(stage);
     }
 
+    // This method is responsible for minimizing the application window when the "Minimize" button is pressed
     @FXML
     public final void minimizeAction() {
         Stage stage = (Stage) btnMinimize.getScene().getWindow();
         viewFactory.minimizeStage(stage);
     }
 
-    // This function is used for moving the MessagePanes on the screen.
+    // This method is a custom implementation used for enabling the movement of the stages around the screen.
     private void addDraggableNode(final Node node) {
         node.setOnMousePressed(event -> {
             if (event.getButton() != MouseButton.MIDDLE) {
@@ -201,9 +219,5 @@ public class CreateAccountController extends BaseController implements Initializ
             }
         });
         visible.play();
-    }
-
-    public void setTxtPath(String path) {
-        this.txtPath.setText(path);
     }
 }

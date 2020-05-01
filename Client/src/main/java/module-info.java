@@ -12,12 +12,19 @@ module Client {
     requires Common;
 
     opens com.chatApplication.chatClient.gui;
-    opens com.chatApplication.chatClient.gui.controllers;
-    opens com.chatApplication.chatClient.gui.handlers;
-    opens com.chatApplication.chatClient.gui.utility;
+    opens com.chatApplication.chatClient.gui.controller;
+    opens com.chatApplication.chatClient.gui.model.handlers;
+    opens com.chatApplication.chatClient.gui.model.utility;
+    opens com.chatApplication.chatClient.gui.controller.services;
+    opens com.chatApplication.chatClient.gui.view;
+    opens com.chatApplication.chatClient.muc;
 
     exports com.chatApplication.chatClient.gui;
-    exports com.chatApplication.chatClient.gui.controllers;
-    exports com.chatApplication.chatClient.gui.handlers;
-    exports com.chatApplication.chatClient.gui.utility;
+    exports com.chatApplication.chatClient.gui.controller;
+    exports com.chatApplication.chatClient.gui.model.handlers;
+    exports com.chatApplication.chatClient.gui.model.utility;
+    exports com.chatApplication.chatClient.gui.controller.services;
+    exports com.chatApplication.chatClient.gui.view;
+    exports com.chatApplication.chatClient.muc;
+
 }

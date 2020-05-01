@@ -1,6 +1,7 @@
-package com.chatApplication.chatClient.gui;
+package com.chatApplication.chatClient.gui.view;
 
-import com.chatApplication.chatClient.gui.controllers.MessagePaneController;
+import com.chatApplication.chatClient.gui.controller.BaseController;
+import com.chatApplication.chatClient.gui.controller.MessagePaneController;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -36,12 +37,10 @@ public class ViewFactory {
         activeStages.put("loginWindowView", stage);
     }
 
-    public void showMainWindow() {
+    public Stage showMainWindow() {
         String fxmlName = "/views/mainWindowView.fxml";
         Stage mainStage = initializeStage(fxmlName, "mainWindowView");
         activeStages.put("mainWindowView", mainStage);
-        Stage loginStage = activeStages.get("loginWindowView");
-        hideStage(loginStage);
         mainStage.setOnHiding(event -> {
             if (activeStages.containsKey("imageCroppingHandler")) {
                 Stage imageCroppingStage = activeStages.get("imageCroppingHandler");
@@ -53,6 +52,7 @@ public class ViewFactory {
             Stage stage = activeStages.get("loginWindowView");
             showStage(stage);
         });
+        return mainStage;
     }
 
     public void showCreateAccountWindow() {
@@ -130,9 +130,6 @@ public class ViewFactory {
         }
         if (messagePanes.containsKey(stageToClose.getTitle())) {
             messagePanes.get(stageToClose.getTitle()).close();
-        }
-        for (String string : activeStages.keySet()) {
-            System.out.println(string);
         }
     }
 

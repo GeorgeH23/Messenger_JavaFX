@@ -1,4 +1,4 @@
-package com.chatApplication.chatClient.gui.utility;
+package com.chatApplication.chatClient.gui.model.utility;
 
 import javafx.stage.FileChooser;
 import javafx.stage.Window;

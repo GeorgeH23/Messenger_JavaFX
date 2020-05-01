@@ -1,6 +1,6 @@
-package com.chatApplication.chatClient.gui.utility;
+package com.chatApplication.chatClient.gui.model.utility;
 
-import com.chatApplication.chatClient.gui.controllers.UserListViewCellController;
+import com.chatApplication.chatClient.gui.controller.UserListViewCellController;
 import javafx.scene.Node;
 import javafx.scene.control.ListCell;
 

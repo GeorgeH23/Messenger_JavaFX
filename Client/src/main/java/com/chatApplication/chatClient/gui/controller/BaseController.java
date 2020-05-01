@@ -1,4 +1,7 @@
-package com.chatApplication.chatClient.gui;
+package com.chatApplication.chatClient.gui.controller;
+
+import com.chatApplication.chatClient.gui.ChatManager;
+import com.chatApplication.chatClient.gui.view.ViewFactory;
 
 public abstract class BaseController {
 

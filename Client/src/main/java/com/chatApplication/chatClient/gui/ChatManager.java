@@ -1,17 +1,15 @@
 package com.chatApplication.chatClient.gui;
 
-import com.chatApplication.chatClient.gui.controllers.MainWindowController;
-import com.chatApplication.chatClient.gui.handlers.ImageHandler;
-import com.chatApplication.chatClient.gui.utility.ChatUser;
+import com.chatApplication.chatClient.gui.controller.MainWindowController;
+import com.chatApplication.chatClient.gui.controller.services.*;
+import com.chatApplication.chatClient.gui.model.utility.ChatUser;
 import com.chatApplication.chatClient.muc.*;
 import com.chatApplication.common.NewUser;
 import com.chatApplication.common.PasswordHasher;
-import com.chatApplication.dataModel.DataSource;
 import javafx.application.Platform;
 import javafx.beans.Observable;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 
@@ -19,7 +17,6 @@ public class ChatManager implements UserAvailabilityListener, UserStatusListener
 
     private static ChatManager instance;
     private final ChatClient chatClient;
-    private DataSource dataSource;
     private PasswordHasher passwordHasher;
     private MainWindowController controller;
     private ObservableList<ChatUser> loggedClientsList;
@@ -29,7 +26,6 @@ public class ChatManager implements UserAvailabilityListener, UserStatusListener
     private ChatManager() {
         this.loggedClientsList = FXCollections.observableArrayList(chatUser -> new Observable[] {chatUser.getStatusImage(), chatUser.getUserImage()});
         this.chatClient = ChatClient.getInstance();
-        this.dataSource = DataSource.getInstance();
         this.passwordHasher = PasswordHasher.getInstance();
     }
 
@@ -50,13 +46,19 @@ public class ChatManager implements UserAvailabilityListener, UserStatusListener
 
     @Override
     public void onPictureChanged(String login) {
-        String username = login.replaceAll("\\p{Punct}", "");
-        String path = DataSource.getInstance().queryUserPicture(username);
-        for (ChatUser user : loggedClientsList) {
-            if (user.getLogin().equals(username)) {
-                user.setUserImage(path);
-            }
-        }
+        Platform.runLater(() -> {
+            String username = login.replaceAll("\\p{Punct}", "");
+            OnPictureChangedService service = new OnPictureChangedService(username);
+            service.start();
+            service.setOnSucceeded(event -> {
+                String path = service.getValue();
+                for (ChatUser user : loggedClientsList) {
+                    if (user.getLogin().equals(username)) {
+                        user.setUserImage(path);
+                    }
+                }
+            });
+        });
     }
 
     @Override
@@ -76,8 +78,19 @@ public class ChatManager implements UserAvailabilityListener, UserStatusListener
     public void online(String login, String userStatus) {
         Platform.runLater(() -> {
             String username = login.replaceAll("\\p{Punct}", "");
-            String path = DataSource.getInstance().queryUserPicture(username);
-            ChatUser chatUser = new ChatUser(username, path, userStatus);
+            OnlineService onlineService = new OnlineService(username);
+            onlineService.start();
+            onlineService.setOnSucceeded(event -> {
+                for (ChatUser chatUser : loggedClientsList) {
+                    if (chatUser.getLogin().equals(username)) {
+                        String path = onlineService.getValue();
+                        chatUser.setUserImage(path);
+                        break;
+                    }
+                }
+            });
+
+            ChatUser chatUser = new ChatUser(username, "", userStatus);
             boolean isInList = false;
             for (ChatUser user : loggedClientsList) {
                 if (user.getLogin().equals(chatUser.getLogin())) {
@@ -87,8 +100,8 @@ public class ChatManager implements UserAvailabilityListener, UserStatusListener
             }
             if (!isInList) {
                 loggedClientsList.add(chatUser);
-                controller.online(login);
             }
+            controller.online(login);
         });
     }
 
@@ -107,27 +120,10 @@ public class ChatManager implements UserAvailabilityListener, UserStatusListener
         });
     }
 
-    public String attemptToLogin(String username, String password) {
-        if (chatClient.connect()) {
-            String serverResponse;
-            try {
-                serverResponse = chatClient.login(username, password);
-                if (serverResponse.equalsIgnoreCase("Login OK")) {
-                    addListeners();
-                    this.loggedUserLogin = chatClient.getThisClientLogin();
-                    this.loggedUserStatus = chatClient.getThisClientStatus();
-                    ImageHandler.getInstance().loadCurrentLoggedUserImage(loggedUserLogin);
-                    return "Login OK";
-                } else if (serverResponse.equalsIgnoreCase("No such username")) {
-                    return "No such username";
-                } else if (serverResponse.equalsIgnoreCase("Incorrect Password")) {
-                    return "Incorrect Password";
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        return "Couldn't connect";
+    public LoginService attemptToLogin(String username, String password) {
+        LoginService loginService = new LoginService(this, chatClient, username, password);
+        loginService.start();
+        return loginService;
     }
 
     public boolean sendMessage(String sendTo, String message) {
@@ -152,13 +148,10 @@ public class ChatManager implements UserAvailabilityListener, UserStatusListener
         }
     }
 
-    public void pictureChange(String clientName, String path) {
-        dataSource.updateUserPicture(clientName, path);
-        try {
-            chatClient.pictureChange();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    public PictureChangeService pictureChange(String clientName, String path) {
+        PictureChangeService service = new PictureChangeService(chatClient, clientName, path);
+        service.start();
+        return service;
     }
 
     public void changeLoggedUserStatus(String newStatus) {
@@ -183,35 +176,17 @@ public class ChatManager implements UserAvailabilityListener, UserStatusListener
         chatClient.addPictureChangeListener(this);
     }
 
-    public void closeDatabaseConnection() {
-        dataSource.close();
-    }
-
-    public void openDatabaseConnection() {
-        dataSource.open();
-    }
-
-    public String createNewAccount(String username, String password, String contactNumber, String picturePath) {
+    public CreateAccountService createNewAccount(String username, String password, String contactNumber, String picturePath) {
         try {
-            password = PasswordHasher.getInstance().generateHash(password);
+            password = passwordHasher.generateHash(password);
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
         }
         NewUser newUser = new NewUser(username, password, contactNumber, picturePath);
+        CreateAccountService createAccountService = new CreateAccountService(newUser);
+        createAccountService.start();
 
-        String response = dataSource.insertNewUser(newUser);
-
-        if (response.equals("New Account Created")) {
-            dataSource.queryUserPicture(username);
-            System.out.println("New Account Created");
-
-            return "Success";
-        }
-        if (response.equals("Username exists")) {
-            System.out.println("Username exists");
-            return "Username Exists";
-        }
-        return "Error";
+        return createAccountService;
     }
 
     public ObservableList<ChatUser> getLoggedClientsList() {
@@ -228,5 +203,13 @@ public class ChatManager implements UserAvailabilityListener, UserStatusListener
 
     public String getLoggedUserLogin() {
         return this.loggedUserLogin;
+    }
+
+    public void setLoggedUserLogin(String loggedUserLogin) {
+        this.loggedUserLogin = loggedUserLogin;
+    }
+
+    public void setLoggedUserStatus(String loggedUserStatus) {
+        this.loggedUserStatus = loggedUserStatus;
     }
 }

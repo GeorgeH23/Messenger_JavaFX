@@ -1,6 +1,5 @@
-package com.chatApplication.chatClient.gui.handlers;
+package com.chatApplication.chatClient.gui.model.handlers;
 
-import com.chatApplication.dataModel.DataSource;
 import javafx.scene.image.Image;
 import javafx.scene.paint.ImagePattern;
 import java.io.File;
@@ -44,8 +43,6 @@ public class ImageHandler {
     }
 
     public void loadCurrentLoggedUserImage(String userName) {
-        DataSource.getInstance().queryUserPicture(userName);
-
         try {
             File file = new File(System.getProperty("user.home") + File.separator + "Documents" + File.separator +
                     "MessengerApplication" + File.separator + userName + ".jpg");
@@ -62,26 +59,6 @@ public class ImageHandler {
     public void changeCurrentLoggedUserImage(Image newImage) {
         currentLoggedUserImage = newImage;
     }
-
-    /*public ImagePattern getAvailableStatusImage() {
-        return new ImagePattern(availableStatusImage);
-    }
-
-    public ImagePattern getBusyStatusImage() {
-        return new ImagePattern(busyStatusImage);
-    }
-
-    public ImagePattern getAwayStatusImage() {
-        return new ImagePattern(awayStatusImage);
-    }
-
-    public ImagePattern getDndStatusImage() {
-        return new ImagePattern(dndStatusImage);
-    }
-
-    public ImagePattern getUnknownStatusImage() {
-        return new ImagePattern(unknownStatusImage);
-    }*/
 
     public ImagePattern getStatusImage(String status) {
         switch (status) {
