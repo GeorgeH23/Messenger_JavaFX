@@ -1,4 +1,4 @@
-package com.chatApplication.chatClient.gui.controller;
+package com.chatApplication.chatClient.gui.controller.enums;
 
 public enum ChatLoginResult {
     SUCCESS,

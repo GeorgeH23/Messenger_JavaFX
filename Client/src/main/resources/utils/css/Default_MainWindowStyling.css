@@ -1,15 +1,14 @@
 .list-cell {
     -fx-background-color: linear-gradient(to left, #4776e6, #8e54e9);
-    //-fx-background-color: #b3dde3;
     -fx-font: 12pt "Arial Black";
     -fx-text-fill: white;
     -fx-font-weight: bold;
 }
 
 .list-view {
-    //-fx-background-color: #b3dde3;
     -fx-background-color: linear-gradient(to left, #4776e6, #8e54e9);
-    //-fx-effect: dropshadow(three-pass-box, purple, 10, 0, 0, 0);
+    /*-fx-background-color: #b3dde3;
+    -fx-effect: dropshadow(three-pass-box, purple, 10, 0, 0, 0);*/
 }
 
 .list-cell:filled:selected:focused, .list-cell:filled:selected {
@@ -43,6 +42,10 @@
     -fx-padding: 0.333333em 0.083333em 0.666667em 0.083333em; /* 4 1 8 1 */
 }
 
+.menu-button {
+    -fx-text-fill: #ffffff;
+}
+
 .menu-item .label {
      -fx-font: 10pt "Monospaced";
      -fx-font-weight: bold;
@@ -53,6 +56,10 @@
     -fx-font-weight: bold;
     -fx-scale-x: 1.07;
     -fx-scale-y: 1.07;
+}
+
+#loggedClientName {
+    -fx-text-fill: white;
 }
 
 ///////////////////////////////

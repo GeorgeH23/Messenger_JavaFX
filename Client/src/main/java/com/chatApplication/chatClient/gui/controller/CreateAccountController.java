@@ -1,9 +1,10 @@
 package com.chatApplication.chatClient.gui.controller;
 
 import com.chatApplication.chatClient.gui.ChatManager;
+import com.chatApplication.chatClient.gui.controller.enums.CreateAccountResult;
 import com.chatApplication.chatClient.gui.view.ViewFactory;
 import com.chatApplication.chatClient.gui.controller.services.CreateAccountService;
-import com.chatApplication.chatClient.gui.model.utility.FileChooserGenerator;
+import com.chatApplication.chatClient.gui.model.FileChooserGenerator;
 import com.chatApplication.chatClient.gui.model.handlers.ImageCroppingHandler;
 import javafx.animation.PauseTransition;
 import javafx.event.Event;

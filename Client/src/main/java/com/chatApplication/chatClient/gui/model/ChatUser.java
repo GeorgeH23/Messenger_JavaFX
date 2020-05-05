@@ -1,4 +1,4 @@
-package com.chatApplication.chatClient.gui.model.utility;
+package com.chatApplication.chatClient.gui.model;
 
 import com.chatApplication.chatClient.gui.model.handlers.ImageHandler;
 import javafx.beans.property.ObjectProperty;

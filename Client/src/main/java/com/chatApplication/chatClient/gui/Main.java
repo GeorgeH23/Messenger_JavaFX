@@ -2,6 +2,7 @@ package com.chatApplication.chatClient.gui;
 
 import com.chatApplication.chatClient.gui.model.handlers.AudioHandler;
 import com.chatApplication.chatClient.gui.model.handlers.ImageHandler;
+import com.chatApplication.chatClient.gui.view.Theme;
 import com.chatApplication.chatClient.gui.view.ViewFactory;
 import javafx.application.Application;
 import javafx.stage.Stage;
@@ -27,6 +28,7 @@ public class Main extends Application {
         }
 
         ImageHandler.getInstance().loadStatusImages();
+        ChatManager.getInstance().setTheme(Theme.THEME_THREE);
         ViewFactory.getInstance().showLoginWindow();
 
         AudioHandler audio = AudioHandler.getInstance();

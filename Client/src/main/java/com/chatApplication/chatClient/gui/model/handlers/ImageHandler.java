@@ -1,6 +1,8 @@
 package com.chatApplication.chatClient.gui.model.handlers;
 
+import com.chatApplication.chatClient.gui.view.Theme;
 import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.paint.ImagePattern;
 import java.io.File;
 import java.net.MalformedURLException;
@@ -15,6 +17,9 @@ public class ImageHandler {
     private Image unknownStatusImage;
     private Image currentLoggedUserImage;
     private Image unknownUserImage;
+    private Image themeOneImage;
+    private Image themeTwoImage;
+    private Image themeThreeImage;
 
     private static ImageHandler instance;
 
@@ -37,6 +42,9 @@ public class ImageHandler {
             dndStatusImage = new Image(getClass().getResource("/utils/images/icons/dnd.png").toURI().toURL().toString(), true);
             unknownStatusImage = new Image(getClass().getResource("/utils/images/icons/unknown.png").toURI().toURL().toString(), true);
             unknownUserImage = new Image(getClass().getResource("/utils/images/users/user.png").toURI().toURL().toString(), true);
+            themeOneImage = new Image(getClass().getResource("/utils/images/icons/themeOne.png").toURI().toURL().toString(), true);
+            themeTwoImage = new Image(getClass().getResource("/utils/images/icons/themeTwo.png").toURI().toURL().toString(), true);
+            themeThreeImage = new Image(getClass().getResource("/utils/images/icons/themeThree.png").toURI().toURL().toString(), true);
         } catch (MalformedURLException | URISyntaxException e) {
             e.printStackTrace();
         }
@@ -81,5 +89,18 @@ public class ImageHandler {
 
     public ImagePattern getUnknownUserImage() {
         return new ImagePattern(unknownUserImage);
+    }
+
+    public Image getCurrentThemeImage(Theme theme) {
+        switch (theme) {
+            case THEME_ONE:
+                return themeOneImage;
+            case THEME_TWO:
+                return themeTwoImage;
+            case THEME_THREE:
+                return themeThreeImage;
+            default:
+                return null;
+        }
     }
 }

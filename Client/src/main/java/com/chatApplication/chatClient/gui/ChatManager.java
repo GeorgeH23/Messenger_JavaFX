@@ -2,7 +2,8 @@ package com.chatApplication.chatClient.gui;
 
 import com.chatApplication.chatClient.gui.controller.MainWindowController;
 import com.chatApplication.chatClient.gui.controller.services.*;
-import com.chatApplication.chatClient.gui.model.utility.ChatUser;
+import com.chatApplication.chatClient.gui.model.ChatUser;
+import com.chatApplication.chatClient.gui.view.Theme;
 import com.chatApplication.chatClient.muc.*;
 import com.chatApplication.common.NewUser;
 import com.chatApplication.common.PasswordHasher;
@@ -22,11 +23,13 @@ public class ChatManager implements UserAvailabilityListener, UserStatusListener
     private ObservableList<ChatUser> loggedClientsList;
     private String loggedUserLogin;
     private String loggedUserStatus;
+    private Theme theme;
 
     private ChatManager() {
         this.loggedClientsList = FXCollections.observableArrayList(chatUser -> new Observable[] {chatUser.getStatusImage(), chatUser.getUserImage()});
         this.chatClient = ChatClient.getInstance();
         this.passwordHasher = PasswordHasher.getInstance();
+        this.theme = Theme.THEME_ONE;
     }
 
     public static ChatManager getInstance() {
@@ -211,5 +214,13 @@ public class ChatManager implements UserAvailabilityListener, UserStatusListener
 
     public void setLoggedUserStatus(String loggedUserStatus) {
         this.loggedUserStatus = loggedUserStatus;
+    }
+
+    public Theme getTheme() {
+        return theme;
+    }
+
+    public void setTheme(Theme theme) {
+        this.theme = theme;
     }
 }

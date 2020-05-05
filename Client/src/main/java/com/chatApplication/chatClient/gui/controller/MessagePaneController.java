@@ -1,10 +1,11 @@
 package com.chatApplication.chatClient.gui.controller;
 
 import com.chatApplication.chatClient.gui.ChatManager;
+import com.chatApplication.chatClient.gui.view.Theme;
 import com.chatApplication.chatClient.gui.view.ViewFactory;
 import com.chatApplication.chatClient.gui.model.handlers.AudioHandler;
 import com.chatApplication.chatClient.gui.model.handlers.ImageHandler;
-import com.chatApplication.chatClient.gui.model.utility.MessageType;
+import com.chatApplication.chatClient.gui.model.MessageType;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
@@ -35,6 +36,7 @@ public class MessagePaneController extends BaseController {
     private double initialY;
     private AudioHandler audio;
     private ImagePattern userImage;
+    private ImageHandler imageHandler;
 
     @FXML
     private Button btnMinimize;
@@ -58,6 +60,7 @@ public class MessagePaneController extends BaseController {
         this.viewFactory = super.viewFactory;
         this.chatManager = super.chatManager;
         this.myself = chatManager.getLoggedUserLogin();
+        this.imageHandler = ImageHandler.getInstance();
     }
 
     @FXML
@@ -98,7 +101,7 @@ public class MessagePaneController extends BaseController {
             txtName = new Text(getCurrentLocalDateTimeStamp() + "\n" + myself + "\n");
 
             try {
-                img.setFill(ImageHandler.getInstance().getCurrentLoggedUserImage());
+                img.setFill(imageHandler.getCurrentLoggedUserImage());
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -109,7 +112,7 @@ public class MessagePaneController extends BaseController {
                 if (userImage != null) {
                     img.setFill(userImage);
                 } else {
-                    img.setFill(ImageHandler.getInstance().getUnknownUserImage());
+                    img.setFill(imageHandler.getUnknownUserImage());
                 }
             } catch (Exception e) {
                 e.printStackTrace();

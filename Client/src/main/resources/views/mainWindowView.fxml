@@ -17,7 +17,7 @@
 <?import javafx.scene.shape.Circle?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane prefHeight="678.0" prefWidth="350.0" stylesheets="@../utils/css/mainWindowStyling.css" xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.chatApplication.chatClient.gui.controller.MainWindowController">
+<AnchorPane prefHeight="678.0" prefWidth="350.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.chatApplication.chatClient.gui.controller.MainWindowController">
    <children>
       <BorderPane fx:id="mainBorderPane" layoutY="98.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="580.0" prefWidth="350.0">
          <center>
@@ -56,8 +56,8 @@
                   <Font name="Monospaced Bold" size="24.0" />
                </font>
             </Label>
-            <Circle fx:id="loggedClientPicture" fill="#f23b23" layoutX="36.0" layoutY="34.0" radius="32.0" stroke="BLACK" strokeType="INSIDE" />
-            <MenuButton fx:id="statusMenu" layoutX="84.0" layoutY="32.0" mnemonicParsing="false" style="-fx-background-color: transparent;" styleClass="list-view" text="undefined" textFill="WHITE">
+            <Circle fx:id="loggedClientPicture" fill="#b2adac" layoutX="36.0" layoutY="34.0" radius="32.0" stroke="BLACK" strokeType="INSIDE" />
+            <MenuButton fx:id="statusMenu" layoutX="84.0" layoutY="32.0" mnemonicParsing="false" style="-fx-background-color: transparent;" text="Unknown" textFill="WHITE">
                <items>
                   <MenuItem mnemonicParsing="false" onAction="#changeStatusToAvailable" styleClass="list-view" text="Available">
                      <graphic>
@@ -96,6 +96,9 @@
                      </graphic>
                   </MenuItem>
                </items>
+               <tooltip>
+                  <Tooltip height="20.0" text="Change status" width="15.0" wrapText="true" />
+               </tooltip>
                <font>
                   <Font name="Monospaced Bold" size="14.0" />
                </font>
@@ -106,8 +109,46 @@
                   <Image url="@../utils/images/icons/addImage.png" />
                </image>
             </ImageView>
-            <Circle fx:id="loggedUserStatusLight" fill="DODGERBLUE" layoutX="55.0" layoutY="57.0" radius="10.0" stroke="BLACK" strokeType="INSIDE" />
+            <Circle fx:id="loggedUserStatusLight" fill="#c4c9cd" layoutX="55.0" layoutY="57.0" radius="10.0" stroke="BLACK" strokeType="INSIDE" />
             <Pane fx:id="changeImagePane" layoutX="4.0" layoutY="2.0" onMousePressed="#changePicture" prefHeight="64.0" prefWidth="64.0" style="-fx-background-color: transparent;" />
+            <MenuButton fx:id="themeMenu" layoutX="289.0" layoutY="32.0" mnemonicParsing="false" prefHeight="32.0" prefWidth="40.0" style="-fx-background-color: transparent;" styleClass="list-view" textFill="WHITE" AnchorPane.rightAnchor="0.0">
+               <items>
+                  <MenuItem fx:id="themeOne" mnemonicParsing="false" onAction="#changeToDefaultTheme" styleClass="list-view" text="Theme 1">
+                     <graphic>
+                        <ImageView fitHeight="22.0" fitWidth="22.0" pickOnBounds="true" preserveRatio="true" styleClass="list-view">
+                           <image>
+                              <Image url="@../utils/images/icons/themeOne.png" />
+                           </image>
+                        </ImageView>
+                     </graphic>
+                  </MenuItem>
+                  <MenuItem fx:id="themeTwo" mnemonicParsing="false" onAction="#changeToThemeTwo" styleClass="list-view" text="Theme 2">
+                     <graphic>
+                        <ImageView fitHeight="22.0" fitWidth="22.0" pickOnBounds="true" preserveRatio="true" styleClass="list-view">
+                           <image>
+                              <Image url="@../utils/images/icons/themeTwo.png" />
+                           </image>
+                        </ImageView>
+                     </graphic></MenuItem>
+                  <MenuItem fx:id="themeThree" mnemonicParsing="false" onAction="#changeToThemeThree" styleClass="list-view" text="Theme 3">
+                     <graphic>
+                        <ImageView fitHeight="22.0" fitWidth="22.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@../utils/images/icons/themeThree.png" />
+                           </image>
+                        </ImageView>
+                     </graphic></MenuItem>
+               </items>
+               <tooltip>
+                  <Tooltip height="20.0" text="Change theme" width="15.0" wrapText="true" />
+               </tooltip>
+               <font>
+                  <Font name="Monospaced Bold" size="14.0" />
+               </font>
+               <graphic>
+                  <ImageView fx:id="menuItemGraphic" fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true" />
+               </graphic>
+            </MenuButton>
          </children>
       </AnchorPane>
    </children>

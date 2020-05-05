@@ -10,9 +10,9 @@
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane fx:id="root" prefHeight="1000.0" prefWidth="1000.0" stylesheets="@../utils/css/imageCroppingHandlerStyling.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.chatApplication.chatClient.gui.controller.ImageCroppingHandlerController">
+<BorderPane fx:id="root" prefHeight="1000.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.chatApplication.chatClient.gui.controller.ImageCroppingHandlerController">
    <bottom>
-       <Button fx:id="cropButton" layoutX="495.0" layoutY="350.0" mnemonicParsing="false" prefHeight="44.0" prefWidth="79.0" text="Crop" AnchorPane.bottomAnchor="15" AnchorPane.rightAnchor="50" BorderPane.alignment="CENTER">
+       <Button fx:id="cropButton" layoutX="495.0" layoutY="350.0" mnemonicParsing="false" prefHeight="44.0" prefWidth="79.0" text="Crop" textFill="WHITE" AnchorPane.bottomAnchor="15" AnchorPane.rightAnchor="50" BorderPane.alignment="CENTER">
          <BorderPane.margin>
             <Insets bottom="15.0" top="15.0" />
          </BorderPane.margin>

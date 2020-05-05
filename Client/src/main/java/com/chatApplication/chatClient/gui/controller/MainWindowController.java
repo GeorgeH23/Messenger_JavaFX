@@ -1,14 +1,15 @@
 package com.chatApplication.chatClient.gui.controller;
 
 import com.chatApplication.chatClient.gui.ChatManager;
+import com.chatApplication.chatClient.gui.view.Theme;
 import com.chatApplication.chatClient.gui.view.ViewFactory;
 import com.chatApplication.chatClient.gui.model.handlers.AudioHandler;
 import com.chatApplication.chatClient.gui.model.handlers.ImageCroppingHandler;
 import com.chatApplication.chatClient.gui.model.handlers.ImageHandler;
 import com.chatApplication.chatClient.gui.controller.services.PictureChangeService;
-import com.chatApplication.chatClient.gui.model.utility.ChatUser;
-import com.chatApplication.chatClient.gui.model.utility.FileChooserGenerator;
-import com.chatApplication.chatClient.gui.model.utility.UserListViewCell;
+import com.chatApplication.chatClient.gui.model.ChatUser;
+import com.chatApplication.chatClient.gui.model.FileChooserGenerator;
+import com.chatApplication.chatClient.gui.model.UserListViewCell;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
@@ -34,6 +35,8 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.Comparator;
 
+import static com.chatApplication.chatClient.gui.view.Theme.*;
+
 public class MainWindowController extends BaseController {
 
     private long startTime;
@@ -44,6 +47,7 @@ public class MainWindowController extends BaseController {
     private ViewFactory viewFactory;
     private ChatManager chatManager;
     private ImageCroppingHandler imageCroppingHandler;
+    private ImageHandler imageHandler;
 
     @FXML
     private ListView<ChatUser> clients;
@@ -65,12 +69,15 @@ public class MainWindowController extends BaseController {
     private Arc changeImageArc;
     @FXML
     private ImageView changeImageIcon;
+    @FXML
+    private ImageView menuItemGraphic;
 
     public MainWindowController() {
         super();
         this.chatManager = super.chatManager;
         this.viewFactory = super.viewFactory;
         this.imageCroppingHandler = ImageCroppingHandler.getInstance();
+        this.imageHandler = ImageHandler.getInstance();
     }
 
     public void initialize() {
@@ -140,28 +147,49 @@ public class MainWindowController extends BaseController {
     private void changeStatusToAvailable() {
         chatManager.changeLoggedUserStatus("available");
         statusMenu.setText("Available");
-        setLoggedUserStatusLight(ImageHandler.getInstance().getStatusImage("available"));
+        setLoggedUserStatusLight(imageHandler.getStatusImage("available"));
     }
 
     @FXML
     private void changeStatusToBusy() {
         chatManager.changeLoggedUserStatus("busy");
         statusMenu.setText("Busy");
-        setLoggedUserStatusLight(ImageHandler.getInstance().getStatusImage("busy"));
+        setLoggedUserStatusLight(imageHandler.getStatusImage("busy"));
     }
 
     @FXML
     private void changeStatusToDoNotDisturb() {
         chatManager.changeLoggedUserStatus("dnd");
         statusMenu.setText("Do Not Disturb");
-        setLoggedUserStatusLight(ImageHandler.getInstance().getStatusImage("dnd"));
+        setLoggedUserStatusLight(imageHandler.getStatusImage("dnd"));
     }
 
     @FXML
     private void changeStatusToAway() {
         chatManager.changeLoggedUserStatus("away");
         statusMenu.setText("Away");
-        setLoggedUserStatusLight(ImageHandler.getInstance().getStatusImage("away"));
+        setLoggedUserStatusLight(imageHandler.getStatusImage("away"));
+    }
+
+    @FXML
+    void changeToDefaultTheme() {
+        chatManager.setTheme(THEME_ONE);
+        viewFactory.updateStyles();
+        menuItemGraphic.setImage(imageHandler.getCurrentThemeImage(THEME_ONE));
+    }
+
+    @FXML
+    private void changeToThemeTwo() {
+        chatManager.setTheme(Theme.THEME_TWO);
+        viewFactory.updateStyles();
+        menuItemGraphic.setImage(imageHandler.getCurrentThemeImage(THEME_TWO));
+    }
+
+    @FXML
+    private void changeToThemeThree() {
+        chatManager.setTheme(Theme.THEME_THREE);
+        viewFactory.updateStyles();
+        menuItemGraphic.setImage(imageHandler.getCurrentThemeImage(THEME_THREE));
     }
 
     @FXML
@@ -184,8 +212,8 @@ public class MainWindowController extends BaseController {
                             Image image = new Image(file.toURI().toURL().toString(), true);
                             image.progressProperty().addListener((obs, ov, nv) -> {
                                 if (nv.equals(1.0)) {
-                                    ImageHandler.getInstance().changeCurrentLoggedUserImage(image);
-                                    loggedClientPicture.setFill(ImageHandler.getInstance().getCurrentLoggedUserImage());
+                                    imageHandler.changeCurrentLoggedUserImage(image);
+                                    loggedClientPicture.setFill(imageHandler.getCurrentLoggedUserImage());
                                 }
                             });
                         } catch (MalformedURLException e) {
@@ -298,7 +326,7 @@ public class MainWindowController extends BaseController {
     }
 
     public final void setLoggedClientPicture() {
-        loggedClientPicture.setFill(ImageHandler.getInstance().getCurrentLoggedUserImage());
+        loggedClientPicture.setFill(imageHandler.getCurrentLoggedUserImage());
     }
 
     public final void setLoggedClientStatus(String loggedUserStatusText) {
@@ -320,5 +348,19 @@ public class MainWindowController extends BaseController {
                 break;
         }
         statusMenu.setText(loggedUserStatusText);
+    }
+
+    public final void setThemeMenuGraphic(Theme theme) {
+        switch (theme) {
+            case THEME_ONE:
+                menuItemGraphic.setImage(imageHandler.getCurrentThemeImage(THEME_ONE));
+                break;
+            case THEME_TWO:
+                menuItemGraphic.setImage(imageHandler.getCurrentThemeImage(THEME_TWO));
+                break;
+            case THEME_THREE:
+                menuItemGraphic.setImage(imageHandler.getCurrentThemeImage(THEME_THREE));
+                break;
+        }
     }
 }

@@ -14,7 +14,8 @@ module Client {
     opens com.chatApplication.chatClient.gui;
     opens com.chatApplication.chatClient.gui.controller;
     opens com.chatApplication.chatClient.gui.model.handlers;
-    opens com.chatApplication.chatClient.gui.model.utility;
+    opens com.chatApplication.chatClient.gui.model;
+    opens com.chatApplication.chatClient.gui.controller.enums;
     opens com.chatApplication.chatClient.gui.controller.services;
     opens com.chatApplication.chatClient.gui.view;
     opens com.chatApplication.chatClient.muc;
@@ -22,7 +23,8 @@ module Client {
     exports com.chatApplication.chatClient.gui;
     exports com.chatApplication.chatClient.gui.controller;
     exports com.chatApplication.chatClient.gui.model.handlers;
-    exports com.chatApplication.chatClient.gui.model.utility;
+    exports com.chatApplication.chatClient.gui.model;
+    exports com.chatApplication.chatClient.gui.controller.enums;
     exports com.chatApplication.chatClient.gui.controller.services;
     exports com.chatApplication.chatClient.gui.view;
     exports com.chatApplication.chatClient.muc;

@@ -1,6 +1,7 @@
 package com.chatApplication.chatClient.gui.controller;
 
 import com.chatApplication.chatClient.gui.ChatManager;
+import com.chatApplication.chatClient.gui.controller.enums.ChatLoginResult;
 import com.chatApplication.chatClient.gui.view.ViewFactory;
 import com.chatApplication.chatClient.gui.model.handlers.ImageHandler;
 import com.chatApplication.chatClient.gui.controller.services.LoginService;
@@ -92,6 +93,7 @@ public class LoginWindowController extends BaseController implements Initializab
                         controller.setLoggedClientName(chatManager.getLoggedUserLogin());
                         controller.setLoggedUserStatusLight(ImageHandler.getInstance().getStatusImage(chatManager.getLoggedUserStatus()));
                         controller.setLoggedClientStatus(chatManager.getLoggedUserStatus());
+                        controller.setThemeMenuGraphic(chatManager.getTheme());
                         controller.setLoggedClientPicture();
                         Stage loginStage = (Stage) btnLogin.getScene().getWindow();
                         viewFactory.hideStage(loginStage);

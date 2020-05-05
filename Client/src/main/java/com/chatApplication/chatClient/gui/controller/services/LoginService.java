@@ -1,6 +1,6 @@
 package com.chatApplication.chatClient.gui.controller.services;
 
-import com.chatApplication.chatClient.gui.controller.ChatLoginResult;
+import com.chatApplication.chatClient.gui.controller.enums.ChatLoginResult;
 import com.chatApplication.chatClient.gui.ChatManager;
 import com.chatApplication.chatClient.gui.model.handlers.ImageHandler;
 import com.chatApplication.chatClient.muc.ChatClient;

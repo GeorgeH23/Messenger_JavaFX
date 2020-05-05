@@ -1,6 +1,6 @@
 package com.chatApplication.chatClient.gui.controller.services;
 
-import com.chatApplication.chatClient.gui.controller.CreateAccountResult;
+import com.chatApplication.chatClient.gui.controller.enums.CreateAccountResult;
 import com.chatApplication.common.NewUser;
 import com.chatApplication.dataModel.DataSource;
 import javafx.concurrent.Service;
