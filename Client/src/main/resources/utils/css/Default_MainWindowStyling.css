@@ -116,7 +116,7 @@
 }
 
 .titled-pane > .title > .arrow-button .arrow {
-    -fx-background-color: -fx-mark-highlight-color, -fx-mark-color;
+    -fx-mark-highlight-color: #4776e6;
     -fx-mark-color: #4776e6;
     -fx-background-insets: 1 0 -1 0, 0;
     -fx-padding: 0.25em 0.3125em 0.25em 0.3125em; /* 3 3.75 3 3.75 */

@@ -2,6 +2,7 @@ package com.chatApplication.chatClient.gui.controller;
 
 import com.chatApplication.chatClient.gui.ChatManager;
 import com.chatApplication.chatClient.gui.controller.enums.ChatLoginResult;
+import com.chatApplication.chatClient.gui.model.SettingsManager;
 import com.chatApplication.chatClient.gui.view.ViewFactory;
 import com.chatApplication.chatClient.gui.model.handlers.ImageHandler;
 import com.chatApplication.chatClient.gui.controller.services.LoginService;
@@ -132,6 +133,7 @@ public class LoginWindowController extends BaseController implements Initializab
     // This method is responsible for closing the application when the "Exit" button is pressed
     @FXML
     public final void closeAction() {
+        SettingsManager.savePreferredTheme(chatManager.getTheme());
         Platform.exit();
         System.exit(0);
     }

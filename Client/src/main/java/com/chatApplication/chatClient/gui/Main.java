@@ -28,7 +28,6 @@ public class Main extends Application {
         }
 
         ImageHandler.getInstance().loadStatusImages();
-        ChatManager.getInstance().setTheme(Theme.THEME_THREE);
         ViewFactory.getInstance().showLoginWindow();
 
         AudioHandler audio = AudioHandler.getInstance();
