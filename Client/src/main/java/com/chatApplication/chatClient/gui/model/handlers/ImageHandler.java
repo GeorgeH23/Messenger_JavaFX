@@ -2,7 +2,6 @@ package com.chatApplication.chatClient.gui.model.handlers;
 
 import com.chatApplication.chatClient.gui.view.Theme;
 import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.paint.ImagePattern;
 import java.io.File;
 import java.net.MalformedURLException;

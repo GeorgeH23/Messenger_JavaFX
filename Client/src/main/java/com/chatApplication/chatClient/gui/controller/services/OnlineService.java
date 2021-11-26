@@ -1,6 +1,5 @@
 package com.chatApplication.chatClient.gui.controller.services;
 
-import com.chatApplication.chatClient.gui.ChatManager;
 import com.chatApplication.dataModel.DataSource;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;

@@ -3,12 +3,8 @@ package com.chatApplication.chatClient.gui.view;
 import com.chatApplication.chatClient.gui.ChatManager;
 import com.chatApplication.chatClient.gui.controller.BaseController;
 import com.chatApplication.chatClient.gui.controller.MessagePaneController;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-import javafx.stage.StageStyle;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -37,7 +33,7 @@ public class ViewFactory {
     }
 
     public void showLoginWindow() {
-        String fxmlName = "/views/LoginWindowView.fxml";
+        String fxmlName = "/views/loginWindowView.fxml";
         Stage stage = viewInitializer.initializeStage(fxmlName, "LoginWindow");
         activeStages.put("LoginWindow", stage);
     }
