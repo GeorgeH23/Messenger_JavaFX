@@ -104,7 +104,7 @@ public class AudioHandler {
         return sounds.get(name).isRunning();
     }
 
-    public int getFrameposition(String name){
+    public int getFramePosition(String name){
         return sounds.get(name).getFramePosition();
     }
 
