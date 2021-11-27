@@ -49,7 +49,7 @@ public class ImageCroppingHandler {
         }
         // the container for the image as a javafx node
         imageCroppingHandlerController.getImageView().setImage(image);
-        // rubberband selection
+        // rubber band selection
         rubberBandSelection = new RubberBandSelection(imageCroppingHandlerController.getImageLayer());
     }
 
