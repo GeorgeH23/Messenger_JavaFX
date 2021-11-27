@@ -8,7 +8,9 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 public class Main extends Application {
+
     private static Controller controller;
+
     @Override
     public void start(Stage primaryStage) throws Exception {
         primaryStage.setTitle("Server");
