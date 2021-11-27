@@ -7,8 +7,8 @@ import java.util.List;
 
 public class ChatClient {
 
-    private final String serverName = "localHost";
-    private final int serverPort = 8818;
+    private static final String SERVER_NAME = "localHost";
+    private static final int SERVER_PORT = 8818;
     private Socket socket;
     private OutputStream serverOut;
     private InputStream serverIn;
@@ -16,10 +16,10 @@ public class ChatClient {
     private String thisClientLogin;
     private String thisClientStatus;
 
-    private List<UserStatusListener> userStatusListeners = new ArrayList<>();
-    private List<MessageListener> messageListeners = new ArrayList<>();
-    private List<UserAvailabilityListener> userAvailabilityListeners = new ArrayList<>();
-    private List<PictureChangeListener> pictureChangeListeners = new ArrayList<>();
+    private final List<UserStatusListener> userStatusListeners = new ArrayList<>();
+    private final List<MessageListener> messageListeners = new ArrayList<>();
+    private final List<UserAvailabilityListener> userAvailabilityListeners = new ArrayList<>();
+    private final List<PictureChangeListener> pictureChangeListeners = new ArrayList<>();
 
     private static ChatClient instance;
 
@@ -170,13 +170,9 @@ public class ChatClient {
 
     public boolean connect() {
         try {
-            try {
-                this.socket = new Socket(this.serverName, this.serverPort);
-            } catch (Exception e){
-                System.out.println("Cannot connect to the server!");
+            if (!openSocket()) {
                 return false;
             }
-
             System.out.println("Client port is " + socket.getLocalPort());
             this.serverOut = socket.getOutputStream();
             this.serverIn = socket.getInputStream();
@@ -186,6 +182,16 @@ public class ChatClient {
             e.printStackTrace();
             return false;
         }
+    }
+
+    private boolean openSocket() {
+        try {
+            this.socket = new Socket(SERVER_NAME, SERVER_PORT);
+        } catch (Exception e){
+            System.out.println("Cannot connect to the server!");
+            return false;
+        }
+        return true;
     }
 
     private boolean disconnect(){
